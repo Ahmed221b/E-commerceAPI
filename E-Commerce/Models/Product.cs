@@ -15,6 +15,10 @@
         public ICollection<ProductColor> ProductColors { get; set; } = new List<ProductColor>();
         public ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
         public ICollection<CustomerReview> CustomerReviews { get; set; } = new List<CustomerReview>();
+        public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
+        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+
+
 
         public int CategoryId { get; set; }
         public Category Category { get; set; }

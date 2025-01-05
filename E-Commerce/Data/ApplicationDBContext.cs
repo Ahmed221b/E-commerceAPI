@@ -82,6 +82,45 @@ namespace E_Commerce.Data
                .WithMany(p => p.ProductColors)
                .HasForeignKey(p => p.ColorId);
 
+            //One To One (Customer - Cart)
+            modelBuilder.Entity<Customer>()
+                .HasOne(p => p.Cart)
+                .WithOne(p => p.Customer)
+                .HasForeignKey<Cart>(p => p.CustomerId);
+
+            //One To One (Customer - Wishlist)
+            modelBuilder.Entity<Customer>()
+               .HasOne(p => p.Wishlist)
+               .WithOne(p => p.Customer)
+               .HasForeignKey<Wishlist>(p => p.CustomerId);
+
+            //Many To Many (Cart - Product)
+            modelBuilder.Entity<CartItem>()
+                .HasKey(p => new {p.CartId, p.ProductId});
+
+            modelBuilder.Entity<CartItem>()
+                .HasOne(p => p.Product)
+                .WithMany(p => p.CartItems)
+                .HasForeignKey(p => p.ProductId);
+
+            modelBuilder.Entity<CartItem>()
+                .HasOne(p => p.Cart)
+                .WithMany(p => p.CartItems)
+                .HasForeignKey(p => p.CartId);
+
+            //Many To Many (Wishlist - Product)
+            modelBuilder.Entity<WishlistItem>()
+                .HasKey(p => new { p.WishlistId, p.ProductId });
+
+            modelBuilder.Entity<WishlistItem>()
+                .HasOne(p => p.Product)
+                .WithMany(p => p.WishlistItems)
+                .HasForeignKey(p => p.ProductId);
+
+            modelBuilder.Entity<WishlistItem>()
+                .HasOne(p => p.Wishlist)
+                .WithMany(p => p.WishlistItems)
+                .HasForeignKey(p => p.WishlistId);
 
 
         }
@@ -94,5 +133,9 @@ namespace E_Commerce.Data
         public DbSet<ProductColor> ProductColors { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
         public DbSet<CustomerReview> CustomerReviews { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<WishlistItem> WishlistItems { get; set; }
     }
 }
