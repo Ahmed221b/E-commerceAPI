@@ -14,7 +14,8 @@ namespace E_Commerce
 
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDBContext>(
-                options =>  {
+                options =>  
+                {
                     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
                 }
             );

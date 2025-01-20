@@ -21,4 +21,8 @@
     <Folder Include="Repositories\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\E-Commerce.Core\E-Commerce.Core.csproj" />
+  </ItemGroup>
+
 </Project>
