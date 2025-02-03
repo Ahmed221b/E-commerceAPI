@@ -1,4 +1,5 @@
-﻿using E_Commerce.Core.Interfaces.Services;
+﻿using E_Commerce.Core.DTO;
+using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +16,31 @@ namespace E_Commerce.Controllers
             _categoryService = categoryService;
         }
 
-      
-    
-       
+        [HttpPost]
+        [Route(nameof(AddCategory))]
+        public async Task<IActionResult> AddCategory(AddCategoryDTO dto)
+        {
+            if (ModelState.IsValid)
+            {
+                var category = await _categoryService.AddCategory(dto);
+                if (category != null)
+                {
+                    return Created();
+                }
+            }
+                return BadRequest();
+        }
+
+        [HttpGet]
+        [Route(nameof(GetCa))]
+        public async Task<IActionResult> GetCategories()
+        {
+            var categories = await _categoryService.Get();
+            if (categories == null)
+            {
+                return NotFound();
+            }
+            return Ok(categories);
+        }
     }
 }
