@@ -38,20 +38,54 @@ namespace E_Commerce.Core.Services
             }
         }
 
-        public async Task<IEnumerable<Category>> GetCategories()
+        public async Task<Response<IEnumerable<Category>>> GetCategories()
         {
-            return await unitOfWork.CategoryRepository.GetAll();
+            var response = new Response<IEnumerable<Category>>();
+            var categories = await unitOfWork.CategoryRepository.GetAll();
+            if (categories == null)
+            {
+                response.Errors.Add(new Error { Code = 404, Message = "No Categories Found" });
+                return response;
+            }
+            response.Data = categories;
+            return response;
         }
 
-        public async Task<Category> GetCategory(int id)
+        public async Task<Response<Category>> GetCategory(int id)
         {
-            return await unitOfWork.CategoryRepository.GetById(id);
+            var response = new Response<Category>();
+            var category = await unitOfWork.CategoryRepository.GetById(id);
+            if (category == null)
+            {
+                response.Errors.Add(new Error { Code = 404, Message = "Category Not Found" });
+                return response;
+            }
+            response.Data = category;
+            return response;
         }
 
-        public async void DeleteCategory(int id)
+        public async Task<Response<string>> DeleteCategory(int id)
         {
+            var response = new Response<string>();
             var category = await GetCategory(id);
-            unitOfWork.CategoryRepository.Remove(category);
+            if (category.Data == null)
+            {
+                response.Errors.Add(new Error { Code = 404, Message = "Category Not Found" });
+                return response;
+            }
+            try
+            {
+                unitOfWork.CategoryRepository.Remove(category.Data);
+                await unitOfWork.Complete();
+                response.Data = "Category Deleted Successfully";
+                return response;
+            }
+            catch (Exception e)
+            {
+                response.Errors.Add(new Error { Code = 500, Message = "Error while deleting Category: " + e.Message });
+                return response;
+            }
+
         }
 
 
