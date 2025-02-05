@@ -19,7 +19,7 @@ namespace E_Commerce.Core.Services
             this.unitOfWork = unitOfWork;
         }
 
-        public async Task<Response<Category>> AddCategory(AddCategoryDTO category)
+        public async Task<Response<Category>> AddCategory(CategoryDTO category)
         {
             var response = new Response<Category>();
             var newCategory = new Category { Name = category.CategoryName};
@@ -88,7 +88,28 @@ namespace E_Commerce.Core.Services
 
         }
 
+        public async Task<Response<Category>> UpdateCategory(int id, CategoryDTO dto)
+        {
+            var response = new Response<Category>();
+            var oldCategory = await GetCategory(id);
+            if (oldCategory == null)
+            {
+                response.Errors.Add(new Error { Code = 404, Message = "Category Not Found" });
+                return response;
+            }
+            try
+            {
+                unitOfWork.CategoryRepository.Update(oldCategory.Data);
+                await unitOfWork.Complete();
+                response.Data = oldCategory.Data;
+                return response;
+            }
+            catch (Exception e)
+            {
+                response.Errors.Add(new Error { Code = 500, Message = "Error while updating Category: " + e.Message });
+                return response;
+            }
 
-
+        }
     }
 }
