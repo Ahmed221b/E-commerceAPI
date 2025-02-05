@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace E_Commerce.Core.DTO
 {
-    public class AddCategoryDTO
+    public class CategoryDTO
     {
         public string CategoryName { get; set; }
     }

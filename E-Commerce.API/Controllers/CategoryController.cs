@@ -18,7 +18,7 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(AddCategory))]
-        public async Task<IActionResult> AddCategory(AddCategoryDTO dto)
+        public async Task<IActionResult> AddCategory(CategoryDTO dto)
         {
             if (ModelState.IsValid)
             {
@@ -32,10 +32,10 @@ namespace E_Commerce.Controllers
         }
 
         [HttpGet]
-        [Route(nameof(GetCa))]
+        [Route(nameof(GetCategories))]
         public async Task<IActionResult> GetCategories()
         {
-            var categories = await _categoryService.Get();
+            var categories = await _categoryService.GetCategories();
             if (categories == null)
             {
                 return NotFound();

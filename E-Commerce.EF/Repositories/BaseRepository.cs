@@ -56,6 +56,7 @@ namespace E_Commerce.EF.Repositories
             => await _context.Set<T>().ToListAsync();
         
 
+
         public async Task<T> GetById(int id)
             => await _context.Set<T>().FindAsync(id);
 
