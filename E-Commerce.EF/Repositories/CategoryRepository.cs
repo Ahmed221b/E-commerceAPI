@@ -7,6 +7,7 @@ using E_Commerce.Core.Interfaces;
 using E_Commerce.Core.Interfaces.Repositories;
 using E_Commerce.Data;
 using E_Commerce.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace E_Commerce.EF.Repositories
 {
@@ -17,5 +18,7 @@ namespace E_Commerce.EF.Repositories
         {
             _context = context;
         }
+
+      
     }
 }

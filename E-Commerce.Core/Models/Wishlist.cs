@@ -6,10 +6,9 @@
         public string CustomerId { get; set; }
 
 
-        public ICollection<Product> Products { get; set; } = new List<Product>();
-        public Customer Customer { get; set; }
-
-        public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
+        public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+        public virtual Customer Customer { get; set; }
+        public virtual ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
 
         
     }

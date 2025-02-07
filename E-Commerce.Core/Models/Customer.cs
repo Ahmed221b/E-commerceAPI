@@ -7,9 +7,9 @@
         public int WishlidtId { get; set; }
         public int CartId { get; set; }
 
-        public Cart Cart { get; set; }
-        public Wishlist Wishlist { get; set; }
-        public ICollection<CustomerReview> CustomerReviews { get; set; } = new List<CustomerReview>();
-        public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public virtual Cart Cart { get; set; }
+        public virtual Wishlist Wishlist { get; set; }
+        public virtual ICollection<CustomerReview> CustomerReviews { get; set; } = new List<CustomerReview>();
+        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

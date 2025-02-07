@@ -1,5 +1,6 @@
 ﻿using E_Commerce.Core.DTO;
 using E_Commerce.Core.Interfaces.Services;
+using E_Commerce.Core.Shared;
 using E_Commerce.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,29 +19,24 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(AddCategory))]
-        public async Task<IActionResult> AddCategory(CategoryDTO dto)
+        public async Task<Response<CategoryDTO>> AddCategory(CategoryDTO dto)
         {
-            if (ModelState.IsValid)
-            {
-                var category = await _categoryService.AddCategory(dto);
-                if (category != null)
-                {
-                    return Created();
-                }
-            }
-                return BadRequest();
+            return await _categoryService.AddCategory(dto);
         }
 
         [HttpGet]
         [Route(nameof(GetCategories))]
-        public async Task<IActionResult> GetCategories()
+        public async Task<Response<IEnumerable<GetCategoryDTO>>> GetCategories()
         {
-            var categories = await _categoryService.GetCategories();
-            if (categories == null)
-            {
-                return NotFound();
-            }
-            return Ok(categories);
+            return await _categoryService.GetCategories();
+        }
+
+        [HttpGet]
+        [Route(nameof(GetCategory))]
+        public async Task<Response<GetCategoryDTO>> GetCategory(int id)
+        {
+            return await _categoryService.GetCategory(id);
+           
         }
     }
 }

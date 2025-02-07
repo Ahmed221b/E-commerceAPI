@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using E_Commerce.Core;
 using E_Commerce.Core.Interfaces.Repositories;
 using E_Commerce.Data;
+using E_Commerce.EF.Repositories;
 
-namespace E_Commerce.EF.Repositories
+namespace E_Commerce.EF
 {
     public class UnitOfWork : IUnitOfWork
     {
@@ -20,13 +21,14 @@ namespace E_Commerce.EF.Repositories
 
 
         private ICategoryRepository _categoryRepository;
-        public ICategoryRepository CategoryRepository {
+        public ICategoryRepository CategoryRepository
+        {
             get => _categoryRepository == null ? _categoryRepository = new CategoryRepository(_context) : _categoryRepository;
         }
 
         public async Task<int> Complete()
         {
-           return await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
 
         public void Dispose()

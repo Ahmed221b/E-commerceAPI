@@ -12,16 +12,16 @@
         public byte[] Image { get; set; }
 
 
-        public ICollection<ProductColor> ProductColors { get; set; } = new List<ProductColor>();
-        public ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
-        public ICollection<CustomerReview> CustomerReviews { get; set; } = new List<CustomerReview>();
-        public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
-        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public virtual ICollection<ProductColor> ProductColors { get; set; } = new List<ProductColor>();
+        public virtual ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
+        public virtual ICollection<CustomerReview> CustomerReviews { get; set; } = new List<CustomerReview>();
+        public virtual ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
+        public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
 
 
         public int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
 
 
     }

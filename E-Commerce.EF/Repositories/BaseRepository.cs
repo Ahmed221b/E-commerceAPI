@@ -57,7 +57,7 @@ namespace E_Commerce.EF.Repositories
         
 
 
-        public async Task<T> GetById(int id)
+        public async Task<T> GetById(int id, params string[] includes)
             => await _context.Set<T>().FindAsync(id);
 
         public async Task<IEnumerable<T>> GetOrderedAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderBy, bool ascending = true)

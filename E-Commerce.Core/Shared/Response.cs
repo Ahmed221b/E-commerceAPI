@@ -9,7 +9,7 @@ namespace E_Commerce.Core.Shared
 {
     public class Response<T> 
     {
-        public List<Error> Errors = new List<Error>();
+        public List<Error> Errors { get; set; } = new List<Error>();
         public bool IsSuccess => !Errors.Any();
         public T Data { get; set; }
     }

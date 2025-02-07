@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using E_Commerce.Core.DTO;
 using E_Commerce.Core.Interfaces.Repositories;
 using E_Commerce.Core.Interfaces.Services;
@@ -19,48 +20,67 @@ namespace E_Commerce.Core.Services
             this.unitOfWork = unitOfWork;
         }
 
-        public async Task<Response<Category>> AddCategory(CategoryDTO category)
+        public async Task<Response<CategoryDTO>> AddCategory(CategoryDTO category)
         {
-            var response = new Response<Category>();
+            var response = new Response<CategoryDTO>();
+            if (await unitOfWork.CategoryRepository.AnyAsync(p => p.Name == category.CategoryName))
+            {
+                response.Errors.Add(new Error { Code = 409 ,Message = "A category wit the same name exists"});
+                return response;
+            }
+
             var newCategory = new Category { Name = category.CategoryName};
             var result = await unitOfWork.CategoryRepository.AddAsync(newCategory);
 
             try
             {
                 await unitOfWork.Complete();
-                response.Data = result;
+                response.Data = new CategoryDTO {CategoryName = result.Name };
                 return response;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                response.Errors.Add(new Error {Code = 500, Message = "Error while saving Category: " + e.Message });
+                response.Errors.Add(new Error {Code = 500, Message = "Error while saving Category: " + ex.Message });
                 return response;
             }
         }
 
-        public async Task<Response<IEnumerable<Category>>> GetCategories()
+        public async Task<Response<IEnumerable<GetCategoryDTO>>> GetCategories()
         {
-            var response = new Response<IEnumerable<Category>>();
+            var response = new Response<IEnumerable<GetCategoryDTO>>();
             var categories = await unitOfWork.CategoryRepository.GetAll();
             if (categories == null)
             {
                 response.Errors.Add(new Error { Code = 404, Message = "No Categories Found" });
                 return response;
             }
-            response.Data = categories;
+            response.Data = categories.Select(P => new GetCategoryDTO { Id = P.Id, Name = P.Name });
             return response;
         }
 
-        public async Task<Response<Category>> GetCategory(int id)
+        public async Task<Response<GetCategoryDTO>> GetCategory(int id)
         {
-            var response = new Response<Category>();
+            var response = new Response<GetCategoryDTO>();
             var category = await unitOfWork.CategoryRepository.GetById(id);
             if (category == null)
             {
                 response.Errors.Add(new Error { Code = 404, Message = "Category Not Found" });
                 return response;
             }
-            response.Data = category;
+            var responseData = new GetCategoryDTO { Id = category.Id, Name = category.Name };
+            responseData.ProductsDto = category.Products
+                .Select(p => new ProductDTO 
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Quantity = p.Quantity,
+                    Price = p.Price,
+                    Discount = p.Discount,
+                    Image = p.Image,
+                    Rate = p.Rate,
+                }).ToList();
+            response.Data = responseData;
             return response;
         }
 
@@ -75,7 +95,7 @@ namespace E_Commerce.Core.Services
             }
             try
             {
-                unitOfWork.CategoryRepository.Remove(category.Data);
+                //unitOfWork.CategoryRepository.Remove(category.Data);
                 await unitOfWork.Complete();
                 response.Data = "Category Deleted Successfully";
                 return response;
@@ -99,9 +119,9 @@ namespace E_Commerce.Core.Services
             }
             try
             {
-                unitOfWork.CategoryRepository.Update(oldCategory.Data);
+                //unitOfWork.CategoryRepository.Update(oldCategory.Data);
                 await unitOfWork.Complete();
-                response.Data = oldCategory.Data;
+               // response.Data = oldCategory.Data;
                 return response;
             }
             catch (Exception e)

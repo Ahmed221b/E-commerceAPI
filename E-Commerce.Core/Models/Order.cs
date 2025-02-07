@@ -9,8 +9,8 @@
 
 
         public string CustomerId { get; set; }
-        public Customer Customer { get; set; }
-        public ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
+        public virtual Customer Customer { get; set; }
+        public virtual ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
 
     }
 }
