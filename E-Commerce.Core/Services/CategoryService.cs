@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http.Results;
 using System.Xml.Linq;
+using AutoMapper;
+using E_Commerce.Core.Custom_Exceptions;
 using E_Commerce.Core.DTO;
 using E_Commerce.Core.Interfaces.Repositories;
 using E_Commerce.Core.Interfaces.Services;
@@ -15,121 +18,81 @@ namespace E_Commerce.Core.Services
     public class CategoryService : ICategoryService
     {
         private readonly IUnitOfWork unitOfWork;
-        public CategoryService(IUnitOfWork unitOfWork)
+        private readonly IMapper mapper;
+        public CategoryService(IUnitOfWork unitOfWork,IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
         }
 
-        public async Task<Response<CategoryDTO>> AddCategory(CategoryDTO category)
+        public async Task<CategoryDTO> AddCategory(CategoryDTO category)
         {
-            var response = new Response<CategoryDTO>();
             if (await unitOfWork.CategoryRepository.AnyAsync(p => p.Name == category.CategoryName))
             {
-                response.Errors.Add(new Error { Code = 409 ,Message = "A category wit the same name exists"});
-                return response;
+                throw new ConflictException("A category with the same name exists.");
             }
 
             var newCategory = new Category { Name = category.CategoryName};
             var result = await unitOfWork.CategoryRepository.AddAsync(newCategory);
-
-            try
-            {
-                await unitOfWork.Complete();
-                response.Data = new CategoryDTO {CategoryName = result.Name };
-                return response;
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add(new Error {Code = 500, Message = "Error while saving Category: " + ex.Message });
-                return response;
-            }
+            await unitOfWork.Complete();
+            return new CategoryDTO { CategoryName = result.Name };
         }
-
-        public async Task<Response<IEnumerable<GetCategoryDTO>>> GetCategories()
+        public async Task<IEnumerable<GetCategoryListDTO>> GetCategories()
         {
-            var response = new Response<IEnumerable<GetCategoryDTO>>();
+
             var categories = await unitOfWork.CategoryRepository.GetAll();
             if (categories == null)
             {
-                response.Errors.Add(new Error { Code = 404, Message = "No Categories Found" });
-                return response;
+                return null;
             }
-            response.Data = categories.Select(P => new GetCategoryDTO { Id = P.Id, Name = P.Name });
-            return response;
+            return mapper.Map<IEnumerable<GetCategoryListDTO>>(categories);
         }
-
-        public async Task<Response<GetCategoryDTO>> GetCategory(int id)
+        public async Task<GetCategoryDTO> GetCategory(int id)
         {
-            var response = new Response<GetCategoryDTO>();
             var category = await unitOfWork.CategoryRepository.GetById(id);
             if (category == null)
             {
-                response.Errors.Add(new Error { Code = 404, Message = "Category Not Found" });
-                return response;
+                return null;
             }
+
             var responseData = new GetCategoryDTO { Id = category.Id, Name = category.Name };
-            responseData.ProductsDto = category.Products
-                .Select(p => new ProductDTO 
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    Quantity = p.Quantity,
-                    Price = p.Price,
-                    Discount = p.Discount,
-                    Image = p.Image,
-                    Rate = p.Rate,
-                }).ToList();
-            response.Data = responseData;
-            return response;
+            responseData.ProductsDto = mapper.Map<List<ProductDTO>>(category.Products);
+            return responseData;
         }
-
-        public async Task<Response<string>> DeleteCategory(int id)
+        public async Task<CategoryDTO> UpdateCategory(int id, CategoryDTO dto)
         {
-            var response = new Response<string>();
-            var category = await GetCategory(id);
-            if (category.Data == null)
+            if (await unitOfWork.CategoryRepository.AnyAsync(p => p.Name == dto.CategoryName))
             {
-                response.Errors.Add(new Error { Code = 404, Message = "Category Not Found" });
-                return response;
+                throw new ConflictException("A category with the same name exists");
             }
-            try
-            {
-                //unitOfWork.CategoryRepository.Remove(category.Data);
-                await unitOfWork.Complete();
-                response.Data = "Category Deleted Successfully";
-                return response;
-            }
-            catch (Exception e)
-            {
-                response.Errors.Add(new Error { Code = 500, Message = "Error while deleting Category: " + e.Message });
-                return response;
-            }
-
-        }
-
-        public async Task<Response<Category>> UpdateCategory(int id, CategoryDTO dto)
-        {
-            var response = new Response<Category>();
-            var oldCategory = await GetCategory(id);
+            var oldCategory = await unitOfWork.CategoryRepository.GetById(id);
             if (oldCategory == null)
             {
-                response.Errors.Add(new Error { Code = 404, Message = "Category Not Found" });
-                return response;
+                return null;
             }
-            try
-            {
-                //unitOfWork.CategoryRepository.Update(oldCategory.Data);
-                await unitOfWork.Complete();
-               // response.Data = oldCategory.Data;
-                return response;
-            }
-            catch (Exception e)
-            {
-                response.Errors.Add(new Error { Code = 500, Message = "Error while updating Category: " + e.Message });
-                return response;
-            }
+            oldCategory.Name = dto.CategoryName;
+            var result = unitOfWork.CategoryRepository.Update(oldCategory);
+            await unitOfWork.Complete();
+            return new CategoryDTO { CategoryName = result.Name };
+        }
+        public async Task<string> DeleteCategory(int id)
+        {
+            var category = await unitOfWork.CategoryRepository.GetById(id);
+            if (category == null)
+                return null;
+            unitOfWork.CategoryRepository.Remove(category);
+            await unitOfWork.Complete();
+            return "Category Deleted Successfully";
+        }
 
+        public async Task<IEnumerable<GetCategoryDTO>> SearchCategories(string name)
+        {
+            var result = await unitOfWork.CategoryRepository.FindAsync(p => p.Name.StartsWith(name));
+            if (result == null)
+            {
+                return null;
+            }
+            return mapper.Map<IEnumerable<GetCategoryDTO>>(result);
         }
     }
 }

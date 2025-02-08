@@ -38,7 +38,7 @@ namespace E_Commerce.EF.Repositories
             => await _context.Set<T>().CountAsync(predicate);
         
 
-        public async Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
             => await _context.Set<T>().Where(predicate).ToListAsync();
         
 
@@ -57,7 +57,7 @@ namespace E_Commerce.EF.Repositories
         
 
 
-        public async Task<T> GetById(int id, params string[] includes)
+        public async Task<T> GetById(int id)
             => await _context.Set<T>().FindAsync(id);
 
         public async Task<IEnumerable<T>> GetOrderedAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderBy, bool ascending = true)

@@ -9,14 +9,14 @@ namespace E_Commerce.Core.Interfaces
 {
     public interface IBaseRepository<T> where T : class
     {
-        Task<T> GetById(int id,params string[] includes);
+        Task<T> GetById(int id);
         Task<IEnumerable<T>> GetAll();
         Task<T> AddAsync(T entity);
         T Update(T entity);
         void Remove(T entity);
         Task<IEnumerable<T>> AddRanged(IEnumerable<T> entities);
         void RemoveRanged(IEnumerable<T> entities);
-        Task<IEnumerable<T>> Find(Expression<Func<T,bool>> predicate);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T,bool>> predicate);
         Task<int> CountAsync(Expression<Func<T, bool>> predicate);
         Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
         Task<IEnumerable<T>> GetPagedAsync(int pageNumber, int pageSize);

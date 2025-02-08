@@ -20,7 +20,9 @@ namespace E_Commerce
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
             // Add services to the container.
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddDbContext<ApplicationDBContext>(
                 options =>  
                 {
