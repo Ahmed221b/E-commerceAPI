@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace E_Commerce.Core.DTO
+namespace E_Commerce.Core.DTO.Category
 {
-    public class GetCategoryDTO
+    public class ProductDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<ProductDTO> ProductsDto { get; set; } = new List<ProductDTO>();
-
+        public double Price { get; set; }
+        public double Rate { get; set; }
+        public int Quantity { get; set; }
     }
 }

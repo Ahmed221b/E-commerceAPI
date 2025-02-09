@@ -7,7 +7,7 @@ using System.Web.Http.Results;
 using System.Xml.Linq;
 using AutoMapper;
 using E_Commerce.Core.Custom_Exceptions;
-using E_Commerce.Core.DTO;
+using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.Interfaces.Repositories;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
@@ -25,7 +25,7 @@ namespace E_Commerce.Core.Services
             this.mapper = mapper;
         }
 
-        public async Task<CategoryDTO> AddCategory(CategoryDTO category)
+        public async Task<GetCategoryDTO> AddCategory(CategoryDTO category)
         {
             if (await unitOfWork.CategoryRepository.AnyAsync(p => p.Name == category.CategoryName))
             {
@@ -35,26 +35,20 @@ namespace E_Commerce.Core.Services
             var newCategory = new Category { Name = category.CategoryName};
             var result = await unitOfWork.CategoryRepository.AddAsync(newCategory);
             await unitOfWork.Complete();
-            return new CategoryDTO { CategoryName = result.Name };
+            return new GetCategoryDTO {Id = result.Id, Name = result.Name };
         }
         public async Task<IEnumerable<GetCategoryListDTO>> GetCategories()
         {
 
             var categories = await unitOfWork.CategoryRepository.GetAll();
-            if (categories == null)
-            {
-                return null;
-            }
             return mapper.Map<IEnumerable<GetCategoryListDTO>>(categories);
         }
         public async Task<GetCategoryDTO> GetCategory(int id)
         {
             var category = await unitOfWork.CategoryRepository.GetById(id);
             if (category == null)
-            {
                 return null;
-            }
-
+ 
             var responseData = new GetCategoryDTO { Id = category.Id, Name = category.Name };
             responseData.ProductsDto = mapper.Map<List<ProductDTO>>(category.Products);
             return responseData;
@@ -67,31 +61,26 @@ namespace E_Commerce.Core.Services
             }
             var oldCategory = await unitOfWork.CategoryRepository.GetById(id);
             if (oldCategory == null)
-            {
                 return null;
-            }
+            
             oldCategory.Name = dto.CategoryName;
             var result = unitOfWork.CategoryRepository.Update(oldCategory);
             await unitOfWork.Complete();
             return new CategoryDTO { CategoryName = result.Name };
         }
-        public async Task<string> DeleteCategory(int id)
+        public async Task<bool> DeleteCategory(int id)
         {
             var category = await unitOfWork.CategoryRepository.GetById(id);
             if (category == null)
-                return null;
+                return false;
             unitOfWork.CategoryRepository.Remove(category);
             await unitOfWork.Complete();
-            return "Category Deleted Successfully";
+            return true;
         }
 
         public async Task<IEnumerable<GetCategoryDTO>> SearchCategories(string name)
         {
             var result = await unitOfWork.CategoryRepository.FindAsync(p => p.Name.StartsWith(name));
-            if (result == null)
-            {
-                return null;
-            }
             return mapper.Map<IEnumerable<GetCategoryDTO>>(result);
         }
     }

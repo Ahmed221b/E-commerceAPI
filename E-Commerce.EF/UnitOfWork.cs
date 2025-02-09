@@ -25,7 +25,11 @@ namespace E_Commerce.EF
         {
             get => _categoryRepository == null ? _categoryRepository = new CategoryRepository(_context) : _categoryRepository;
         }
-
+        private IColorRepository _colorRepository;
+        public IColorRepository ColorRepository
+        {
+            get => _colorRepository == null ? _colorRepository = new ColorRepository(_context) : _colorRepository;
+        }
         public async Task<int> Complete()
         {
             return await _context.SaveChangesAsync();

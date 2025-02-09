@@ -4,14 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace E_Commerce.Core.DTO
+namespace E_Commerce.Core.DTO.Color
 {
-    public class ProductDTO
+    public class GetColorDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public double Price { get; set; }
-        public double Rate { get; set; }
-        public int Quantity { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using E_Commerce.Core.Custom_Exceptions;
-using E_Commerce.Core.DTO;
+using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
 using E_Commerce.Models;
@@ -20,9 +20,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(AddCategory))]
-        public async Task<ActionResult<Response<CategoryDTO>>> AddCategory(CategoryDTO dto)
+        public async Task<ActionResult<Response<GetCategoryDTO>>> AddCategory(CategoryDTO dto)
         {
-            var response = new Response<CategoryDTO>();
+            var response = new Response<GetCategoryDTO>();
             try
             {
                 var result = await _categoryService.AddCategory(dto);
@@ -122,12 +122,12 @@ namespace E_Commerce.Controllers
             try
             {
                 var result = await _categoryService.DeleteCategory(id);
-                if (result == null)
+                if (!result)
                 {
                     response.Errors.Add(new Error { Code = 404, Message = "Category Not found" });
                     return NotFound(response);
                 }
-                response.Data = result;
+                response.Data = "Category deleted successfully";
                 return Ok(response);
             }
             catch (Exception ex)

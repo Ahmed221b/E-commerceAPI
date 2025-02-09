@@ -14,6 +14,7 @@ namespace E_Commerce.Core
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<ICategoryService,CategoryService>();
+            services.AddScoped<IColorService, ColorService>();
 
             return services;
         }

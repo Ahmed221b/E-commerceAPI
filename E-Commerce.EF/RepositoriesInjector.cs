@@ -18,7 +18,6 @@ namespace E_Commerce.EF
         {
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-
             return services;
         }
     }

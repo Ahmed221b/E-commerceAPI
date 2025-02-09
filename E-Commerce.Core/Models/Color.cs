@@ -6,8 +6,5 @@
         public string Name { get; set; }
 
         public virtual ICollection<ProductColor> ProductColors { get; set; } = new List<ProductColor>();
-
-
-
     }
 }
