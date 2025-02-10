@@ -12,7 +12,7 @@ namespace E_Commerce.Core.Interfaces.Services
         Task<IEnumerable<GetColorDTO>> GetColors();
         Task<GetColorDTO> GetColor(int id);
         Task<GetColorDTO> CreateColor(ColorDTO color);
-        Task<GetColorDTO> UpdateColor(int id, ColorDTO color);
+        Task<GetColorDTO> UpdateColor(UpdateColorDTO color);
         Task<bool> DeleteColor(int id);
         Task<IEnumerable<GetColorDTO>> SearchColors(string name);
 

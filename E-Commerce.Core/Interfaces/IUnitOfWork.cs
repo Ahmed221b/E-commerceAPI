@@ -13,6 +13,7 @@ namespace E_Commerce.Core
         //Add The Repositories of the appliction here
         ICategoryRepository CategoryRepository { get; }
         IColorRepository ColorRepository { get; }
+        IProductRepository ProductRepository { get; }
         Task<int> Complete();
     }
 }

@@ -70,17 +70,17 @@ namespace E_Commerce.Core.Services
             return _mapper.Map<IEnumerable<GetColorDTO>>(colors);
         }
 
-        public async Task<GetColorDTO> UpdateColor(int id, ColorDTO color)
+        public async Task<GetColorDTO> UpdateColor(UpdateColorDTO color)
         {
-            if (await _unitOfWork.ColorRepository.AnyAsync(p => p.Name == color.Name))
+            if (await _unitOfWork.ColorRepository.AnyAsync(p => p.Name == color.ColorName))
             {
                 throw new ConflictException("A color with the same name already exists");
             }
-            var oldColor = await _unitOfWork.ColorRepository.GetById(id);
+            var oldColor = await _unitOfWork.ColorRepository.GetById(color.Id);
             if (oldColor == null)
                 return null;
 
-            oldColor.Name = color.Name;
+            oldColor.Name = color.ColorName;
             var updatedColor = _unitOfWork.ColorRepository.Update(oldColor);
             await _unitOfWork.Complete();
             return _mapper.Map<GetColorDTO>(updatedColor);

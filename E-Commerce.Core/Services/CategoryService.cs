@@ -50,16 +50,16 @@ namespace E_Commerce.Core.Services
                 return null;
  
             var responseData = new GetCategoryDTO { Id = category.Id, Name = category.Name };
-            responseData.ProductsDto = mapper.Map<List<ProductDTO>>(category.Products);
+            responseData.ProductsDto = mapper.Map<List<CategpryProductDTO>>(category.Products);
             return responseData;
         }
-        public async Task<CategoryDTO> UpdateCategory(int id, CategoryDTO dto)
+        public async Task<CategoryDTO> UpdateCategory(UpdateCategoryDTO dto)
         {
             if (await unitOfWork.CategoryRepository.AnyAsync(p => p.Name == dto.CategoryName))
             {
                 throw new ConflictException("A category with the same name exists");
             }
-            var oldCategory = await unitOfWork.CategoryRepository.GetById(id);
+            var oldCategory = await unitOfWork.CategoryRepository.GetById(dto.Id);
             if (oldCategory == null)
                 return null;
             
