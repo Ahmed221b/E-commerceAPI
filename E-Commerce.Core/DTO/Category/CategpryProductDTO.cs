@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace E_Commerce.Core.DTO.Category
 {
-    public class GetCategoryDTO
+    public class CategpryProductDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<CategpryProductDTO> ProductsDto { get; set; } = new List<CategpryProductDTO>();
-
+        public double Price { get; set; }
+        public double Rate { get; set; }
+        public int Quantity { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace E_Commerce.Core
     {
         public MappingProfile() 
         {
-            CreateMap<Product, ProductDTO>().ReverseMap();
+            CreateMap<Product, CategpryProductDTO>().ReverseMap();
             CreateMap<Category,GetCategoryDTO>().ReverseMap();
             CreateMap<Category,GetCategoryListDTO>().ReverseMap();
             CreateMap<Color, GetColorDTO>().ReverseMap();

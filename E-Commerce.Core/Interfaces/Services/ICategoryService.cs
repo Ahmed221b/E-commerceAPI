@@ -14,7 +14,7 @@ namespace E_Commerce.Core.Interfaces.Services
         Task<GetCategoryDTO> AddCategory(CategoryDTO dto);
         Task<IEnumerable<GetCategoryListDTO>> GetCategories();
         Task<GetCategoryDTO> GetCategory(int id);
-        Task<CategoryDTO> UpdateCategory(int id, CategoryDTO dto);
+        Task<CategoryDTO> UpdateCategory(UpdateCategoryDTO dto);
         Task<bool> DeleteCategory(int id);
         Task<IEnumerable<GetCategoryDTO>> SearchCategories(string name);
     }

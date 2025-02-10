@@ -15,7 +15,7 @@ namespace E_Commerce.Core
         {
             services.AddScoped<ICategoryService,CategoryService>();
             services.AddScoped<IColorService, ColorService>();
-
+            services.AddScoped<IProductService, ProductService>();
             return services;
         }
     }
