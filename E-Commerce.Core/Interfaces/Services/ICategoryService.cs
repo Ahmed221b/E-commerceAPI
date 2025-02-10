@@ -11,11 +11,11 @@ namespace E_Commerce.Core.Interfaces.Services
 {
     public interface ICategoryService
     {
-        Task<GetCategoryDTO> AddCategory(CategoryDTO dto);
-        Task<IEnumerable<GetCategoryListDTO>> GetCategories();
-        Task<GetCategoryDTO> GetCategory(int id);
-        Task<CategoryDTO> UpdateCategory(UpdateCategoryDTO dto);
-        Task<bool> DeleteCategory(int id);
-        Task<IEnumerable<GetCategoryDTO>> SearchCategories(string name);
+        Task<ServiceResult<GetCategoryDTO>> AddCategory(AddCategoryDTO dto);
+        Task<ServiceResult<IEnumerable<GetCategoryListDTO>>> GetCategories();
+        Task<ServiceResult<GetCategoryDTO>> GetCategory(int id);
+        Task<ServiceResult<GetCategoryDTO>> UpdateCategory(UpdateCategoryDTO dto);
+        Task<ServiceResult<bool>> DeleteCategory(int id);
+        Task<ServiceResult<IEnumerable<GetCategoryListDTO>>> SearchCategories(string name);
     }
 }

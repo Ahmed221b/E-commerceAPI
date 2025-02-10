@@ -25,63 +25,111 @@ namespace E_Commerce.Core.Services
             this.mapper = mapper;
         }
 
-        public async Task<GetCategoryDTO> AddCategory(CategoryDTO category)
+        public async Task<ServiceResult<GetCategoryDTO>> AddCategory(AddCategoryDTO category)
         {
             if (await unitOfWork.CategoryRepository.AnyAsync(p => p.Name == category.CategoryName))
             {
-                throw new ConflictException("A category with the same name exists.");
+                return new ServiceResult<GetCategoryDTO>("A category with the same name exists", 409);
+            }
+            try
+            {
+                var newCategory = new Category { Name = category.CategoryName };
+                var result = await unitOfWork.CategoryRepository.AddAsync(newCategory);
+                await unitOfWork.Complete();
+                var data = mapper.Map<GetCategoryDTO>(result);
+                return new ServiceResult<GetCategoryDTO>(data);
+            }
+            catch (Exception e)
+            {
+                return new ServiceResult<GetCategoryDTO>(e.Message, 500);
+            }
+          
+        }
+        public async Task<ServiceResult<IEnumerable<GetCategoryListDTO>>> GetCategories()
+        {
+            try
+            {
+                var categories = await unitOfWork.CategoryRepository.GetAll();
+                if (categories.Count() == 0)
+                    return new ServiceResult<IEnumerable<GetCategoryListDTO>>("No Categories found", 404);
+                
+                var data = mapper.Map<IEnumerable<GetCategoryListDTO>>(categories);
+                return new ServiceResult<IEnumerable<GetCategoryListDTO>>(data);
+            }
+            catch (Exception e)
+            {
+                return new ServiceResult<IEnumerable<GetCategoryListDTO>>(e.Message, 500);
+            }
+            
+        }
+        public async Task<ServiceResult<GetCategoryDTO>> GetCategory(int id)
+        {
+            try
+            {
+                var category = await unitOfWork.CategoryRepository.GetById(id);
+                if (category == null)
+                    return new ServiceResult<GetCategoryDTO>($"No Category with id {id} was found", 404);
+
+                var data = mapper.Map<GetCategoryDTO>(category);
+                data.ProductsDto = mapper.Map<List<CategpryProductDTO>>(category.Products);
+                return new ServiceResult<GetCategoryDTO>(data);
+            }
+            catch (Exception e)
+            {
+                return new ServiceResult<GetCategoryDTO>(e.Message, 500);
             }
 
-            var newCategory = new Category { Name = category.CategoryName};
-            var result = await unitOfWork.CategoryRepository.AddAsync(newCategory);
-            await unitOfWork.Complete();
-            return new GetCategoryDTO {Id = result.Id, Name = result.Name };
         }
-        public async Task<IEnumerable<GetCategoryListDTO>> GetCategories()
-        {
 
-            var categories = await unitOfWork.CategoryRepository.GetAll();
-            return mapper.Map<IEnumerable<GetCategoryListDTO>>(categories);
-        }
-        public async Task<GetCategoryDTO> GetCategory(int id)
-        {
-            var category = await unitOfWork.CategoryRepository.GetById(id);
-            if (category == null)
-                return null;
- 
-            var responseData = new GetCategoryDTO { Id = category.Id, Name = category.Name };
-            responseData.ProductsDto = mapper.Map<List<CategpryProductDTO>>(category.Products);
-            return responseData;
-        }
-        public async Task<CategoryDTO> UpdateCategory(UpdateCategoryDTO dto)
+        public async Task<ServiceResult<GetCategoryDTO>> UpdateCategory(UpdateCategoryDTO dto)
         {
             if (await unitOfWork.CategoryRepository.AnyAsync(p => p.Name == dto.CategoryName))
             {
-                throw new ConflictException("A category with the same name exists");
+                return new ServiceResult<GetCategoryDTO>("A category with the same name exists", 409);
             }
             var oldCategory = await unitOfWork.CategoryRepository.GetById(dto.Id);
             if (oldCategory == null)
-                return null;
-            
+                return new ServiceResult<GetCategoryDTO>($"No Category with id {dto.Id} was found", 404);
+
             oldCategory.Name = dto.CategoryName;
             var result = unitOfWork.CategoryRepository.Update(oldCategory);
             await unitOfWork.Complete();
-            return new CategoryDTO { CategoryName = result.Name };
-        }
-        public async Task<bool> DeleteCategory(int id)
-        {
-            var category = await unitOfWork.CategoryRepository.GetById(id);
-            if (category == null)
-                return false;
-            unitOfWork.CategoryRepository.Remove(category);
-            await unitOfWork.Complete();
-            return true;
+            var updatedCategory = mapper.Map<GetCategoryDTO>(result);
+            return new ServiceResult<GetCategoryDTO>(updatedCategory);
         }
 
-        public async Task<IEnumerable<GetCategoryDTO>> SearchCategories(string name)
+        public async Task<ServiceResult<bool>> DeleteCategory(int id)
         {
-            var result = await unitOfWork.CategoryRepository.FindAsync(p => p.Name.StartsWith(name));
-            return mapper.Map<IEnumerable<GetCategoryDTO>>(result);
+            try
+            {
+                var category = await unitOfWork.CategoryRepository.GetById(id);
+                if (category == null)
+                    return new ServiceResult<bool>($"No Category with id {id} was found", 404);
+                unitOfWork.CategoryRepository.Remove(category);
+                await unitOfWork.Complete();
+                return new ServiceResult<bool>(true);
+            }
+            catch (Exception e)
+            {
+                return new ServiceResult<bool>(e.Message, 500);
+            }
+
+        }
+
+        public async Task<ServiceResult<IEnumerable<GetCategoryListDTO>>> SearchCategories(string name)
+        {
+            try
+            {
+                var result = await unitOfWork.CategoryRepository.FindAsync(p => p.Name.StartsWith(name));
+                if (result.Count() == 0)
+                    return new ServiceResult<IEnumerable<GetCategoryListDTO>>("No match found!", 404);
+                var data = mapper.Map<IEnumerable<GetCategoryListDTO>>(result);
+                return new ServiceResult<IEnumerable<GetCategoryListDTO>>(data);
+            }
+            catch (Exception e)
+            {
+                return new ServiceResult<IEnumerable<GetCategoryListDTO>>(e.Message, 500);
+            }
         }
     }
 }

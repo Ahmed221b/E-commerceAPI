@@ -134,12 +134,12 @@ namespace E_Commerce.Controllers
 
         [HttpPut]
         [Route(nameof(UpdateColor))]
-        public async Task<ActionResult<Response<GetColorDTO>>> UpdateColor(int id, ColorDTO color)
+        public async Task<ActionResult<Response<GetColorDTO>>> UpdateColor(UpdateColorDTO color)
         {
             var response = new Response<GetColorDTO>();
             try
             {
-                var updatedColor = await _colorService.UpdateColor(id, color);
+                var updatedColor = await _colorService.UpdateColor(color);
                 if (updatedColor == null)
                 {
                     response.Errors.Add(new Error { Code = 404, Message = "Color not found" });

@@ -1,6 +1,6 @@
 ﻿namespace E_Commerce.Core.DTO.Category
 {
-    public class CategoryDTO
+    public class AddCategoryDTO
     {
         public string CategoryName { get; set; }
     }
