@@ -3,22 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using E_Commerce.Core.DTO.Product;
 using E_Commerce.Core.Interfaces.Services;
+using E_Commerce.Models;
 
 namespace E_Commerce.Core.Services
 {
     public class ProductService : IProductService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public ProductService(IUnitOfWork unitOfWork)
+        private IMapper _mapper;
+        public ProductService(IUnitOfWork unitOfWork,IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public Task<GetProductDTO> AddProduct(AddProductDTO product)
+        public async Task<GetProductDTO> AddProduct(AddProductDTO product)
         {
-            throw new NotImplementedException();
+            var newProduct = new Product
+            {
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                CategoryId = product.CategoryId
+            };
+            
+            var addedProduct = await _unitOfWork.ProductRepository.AddAsync(newProduct);
+            await _unitOfWork.Complete();
+            return _mapper.Map<GetProductDTO>(addedProduct);
         }
 
         public Task<bool> DeleteProduct(int id)
@@ -31,14 +45,16 @@ namespace E_Commerce.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<GetProductDTO>> GetAllProducts()
+        public async Task<IEnumerable<GetProductDTO>> GetAllProducts()
         {
-            throw new NotImplementedException();
+            var products = await _unitOfWork.ProductRepository.GetAll();
+            return _mapper.Map<IEnumerable<GetProductDTO>>(products);
         }
 
-        public Task<GetProductDTO> GetProductById(int id)
+        public async Task<GetProductDTO> GetProductById(int id)
         {
-            throw new NotImplementedException();
+            var product = await _unitOfWork.ProductRepository.GetById(id);
+            return _mapper.Map<GetProductDTO>(product);
         }
 
         public Task<IEnumerable<GetProductDTO>> GetProductsByCategory(int categoryId)
