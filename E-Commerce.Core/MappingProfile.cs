@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.DTO.Color;
+using E_Commerce.Core.DTO.Product;
 using E_Commerce.Models;
 
 namespace E_Commerce.Core
@@ -18,6 +19,7 @@ namespace E_Commerce.Core
             CreateMap<Category,GetCategoryDTO>().ReverseMap();
             CreateMap<Category,GetCategoryListDTO>().ReverseMap();
             CreateMap<Color, GetColorDTO>().ReverseMap();
+            CreateMap<Product,AddProductDTO>().ReverseMap();
         }
     }
 }
