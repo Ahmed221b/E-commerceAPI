@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace E_Commerce.Core.DTO.Color
 {
-    public class GetColorDTO
+    public class ColorDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

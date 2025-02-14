@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using E_Commerce.Core.DTO.Color;
 
 namespace E_Commerce.Core.DTO.Product
 {
@@ -17,6 +18,8 @@ namespace E_Commerce.Core.DTO.Product
         public int Quantity { get; set; }
         public string ImageBase64 { get; set; }
         public string Category { get; set; }
+        public List<string> Colors { get; set; }
+
 
     }
 }

@@ -83,19 +83,27 @@ namespace E_Commerce.Core.Services
 
         public async Task<ServiceResult<GetCategoryDTO>> UpdateCategory(UpdateCategoryDTO dto)
         {
-            if (await unitOfWork.CategoryRepository.AnyAsync(p => p.Name == dto.CategoryName))
+            try
             {
-                return new ServiceResult<GetCategoryDTO>("A category with the same name exists", 409);
-            }
-            var oldCategory = await unitOfWork.CategoryRepository.GetById(dto.Id);
-            if (oldCategory == null)
-                return new ServiceResult<GetCategoryDTO>($"No Category with id {dto.Id} was found", 404);
+                if (await unitOfWork.CategoryRepository.AnyAsync(p => p.Name == dto.CategoryName))
+                {
+                    return new ServiceResult<GetCategoryDTO>("A category with the same name exists", 409);
+                }
+                var oldCategory = await unitOfWork.CategoryRepository.GetById(dto.Id);
+                if (oldCategory == null)
+                    return new ServiceResult<GetCategoryDTO>($"No Category with id {dto.Id} was found", 404);
 
-            oldCategory.Name = dto.CategoryName;
-            var result = unitOfWork.CategoryRepository.Update(oldCategory);
-            await unitOfWork.Complete();
-            var updatedCategory = mapper.Map<GetCategoryDTO>(result);
-            return new ServiceResult<GetCategoryDTO>(updatedCategory);
+                oldCategory.Name = dto.CategoryName;
+                var result = unitOfWork.CategoryRepository.Update(oldCategory);
+                await unitOfWork.Complete();
+                var updatedCategory = mapper.Map<GetCategoryDTO>(result);
+                return new ServiceResult<GetCategoryDTO>(updatedCategory);
+            }
+            catch (Exception e)
+            {
+                return new ServiceResult<GetCategoryDTO>(e.Message, 500);
+            }
+
         }
 
         public async Task<ServiceResult<bool>> DeleteCategory(int id)
