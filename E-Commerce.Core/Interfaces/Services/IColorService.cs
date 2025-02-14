@@ -10,12 +10,12 @@ namespace E_Commerce.Core.Interfaces.Services
 {
     public interface IColorService
     {
-        Task<ServiceResult<IEnumerable<GetColorDTO>>> GetColors();
-        Task<ServiceResult<GetColorDTO>> GetColor(int id);
-        Task<ServiceResult<GetColorDTO>> CreateColor(AddColorDTO color);
-        Task<ServiceResult<GetColorDTO>> UpdateColor(UpdateColorDTO color);
+        Task<ServiceResult<IEnumerable<ColorDTO>>> GetColors();
+        Task<ServiceResult<ColorDTO>> GetColor(int id);
+        Task<ServiceResult<ColorDTO>> CreateColor(AddColorDTO color);
+        Task<ServiceResult<ColorDTO>> UpdateColor(UpdateColorDTO color);
         Task<ServiceResult<bool>> DeleteColor(int id);
-        Task<ServiceResult<IEnumerable<GetColorDTO>>> SearchColors(string name);
+        Task<ServiceResult<IEnumerable<ColorDTO>>> SearchColors(string name);
 
 
     }

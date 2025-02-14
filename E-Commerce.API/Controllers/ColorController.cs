@@ -19,9 +19,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(CreateColor))]
-        public async Task<ActionResult<Response<GetColorDTO>>> CreateColor(AddColorDTO color)
+        public async Task<ActionResult<Response<ColorDTO>>> CreateColor(AddColorDTO color)
         {
-            var response = new Response<GetColorDTO>();
+            var response = new Response<ColorDTO>();
             var result = await _colorService.CreateColor(color);
             if (result.StatusCode == 409)
             {
@@ -39,9 +39,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetColor))]
-        public async Task<ActionResult<Response<GetColorDTO>>> GetColor(int id)
+        public async Task<ActionResult<Response<ColorDTO>>> GetColor(int id)
         {
-            var response = new Response<GetColorDTO>();
+            var response = new Response<ColorDTO>();
             var result = await _colorService.GetColor(id);
             if (result.StatusCode == 404)
             {
@@ -55,7 +55,7 @@ namespace E_Commerce.Controllers
             return Ok(response);
         }
 
-        [HttpPost]
+        [HttpDelete]
         [Route(nameof(DeleteColor))]
         public async Task<ActionResult<Response<string>>> DeleteColor(int id)
         {
@@ -75,9 +75,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetColors))]
-        public async Task<ActionResult<Response<IEnumerable<GetColorDTO>>>> GetColors()
+        public async Task<ActionResult<Response<IEnumerable<ColorDTO>>>> GetColors()
         {
-            var response = new Response<IEnumerable<GetColorDTO>>();
+            var response = new Response<IEnumerable<ColorDTO>>();
             var result = await _colorService.GetColors();
             if (result.StatusCode == 404)
             {
@@ -95,9 +95,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(SearchColors))]
-        public async Task<ActionResult<Response<IEnumerable<GetColorDTO>>>> SearchColors(string name)
+        public async Task<ActionResult<Response<IEnumerable<ColorDTO>>>> SearchColors(string name)
         {
-            var response = new Response<IEnumerable<GetColorDTO>>();
+            var response = new Response<IEnumerable<ColorDTO>>();
             var result = await _colorService.SearchColors(name);
             if (result.StatusCode == 404)
             {
@@ -113,9 +113,9 @@ namespace E_Commerce.Controllers
 
         [HttpPut]
         [Route(nameof(UpdateColor))]
-        public async Task<ActionResult<Response<GetColorDTO>>> UpdateColor(UpdateColorDTO color)
+        public async Task<ActionResult<Response<ColorDTO>>> UpdateColor(UpdateColorDTO color)
         {
-            var response = new Response<GetColorDTO>();
+            var response = new Response<ColorDTO>();
             var result = await _colorService.UpdateColor(color);
             if (result.StatusCode == 404)
             {
