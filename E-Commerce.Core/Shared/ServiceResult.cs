@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +24,7 @@ namespace E_Commerce.Core.Shared
         {
             IsSuccess = true;
             Data = data;
-            StatusCode = 200;
+            StatusCode = (int)HttpStatusCode.OK;
         }
         public ServiceResult(string message,int statusCode)
         {

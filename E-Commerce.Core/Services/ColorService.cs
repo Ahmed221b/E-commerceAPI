@@ -22,22 +22,22 @@ namespace E_Commerce.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<ServiceResult<GetColorDTO>> CreateColor(AddColorDTO color)
+        public async Task<ServiceResult<ColorDTO>> CreateColor(AddColorDTO color)
         {
             try
             {
                 if (await _unitOfWork.ColorRepository.AnyAsync(p => p.Name == color.Name))
-                    return new ServiceResult<GetColorDTO>("A color with the same name already exists", 409);
+                    return new ServiceResult<ColorDTO>("A color with the same name already exists", 409);
 
                 var newColor = new Color { Name = color.Name };
                 await _unitOfWork.ColorRepository.AddAsync(newColor);
                 await _unitOfWork.Complete();
-                var data = _mapper.Map<GetColorDTO>(newColor);
-                return new ServiceResult<GetColorDTO>(data);
+                var data = _mapper.Map<ColorDTO>(newColor);
+                return new ServiceResult<ColorDTO>(data);
             }
             catch (Exception ex)
             {
-                return new ServiceResult<GetColorDTO>(ex.Message, 500);
+                return new ServiceResult<ColorDTO>(ex.Message, 500);
             }
    
         }
@@ -61,77 +61,77 @@ namespace E_Commerce.Core.Services
 
         }
 
-        public async Task<ServiceResult<GetColorDTO>> GetColor(int id)
+        public async Task<ServiceResult<ColorDTO>> GetColor(int id)
         {
             try
             {
                 var color = await _unitOfWork.ColorRepository.GetById(id);
                 if (color == null)
-                    return new ServiceResult<GetColorDTO>($"No color with id = {id} found", 404);
+                    return new ServiceResult<ColorDTO>($"No color with id = {id} found", 404);
 
-                var data = _mapper.Map<GetColorDTO>(color);
-                return new ServiceResult<GetColorDTO>(data);
+                var data = _mapper.Map<ColorDTO>(color);
+                return new ServiceResult<ColorDTO>(data);
             }
             catch (Exception ex)
             {
-                return new ServiceResult<GetColorDTO>(ex.Message, 500);
+                return new ServiceResult<ColorDTO>(ex.Message, 500);
             }
         }
 
-        public async Task<ServiceResult<IEnumerable<GetColorDTO>>> GetColors()
+        public async Task<ServiceResult<IEnumerable<ColorDTO>>> GetColors()
         {
             try
             {
                 var colors = await _unitOfWork.ColorRepository.GetAll();
                 if (colors.Count() == 0)
-                    return new ServiceResult<IEnumerable<GetColorDTO>>("No colors found", 404);
-                var data = _mapper.Map<IEnumerable<GetColorDTO>>(colors);
-                return new ServiceResult<IEnumerable<GetColorDTO>>(data);
+                    return new ServiceResult<IEnumerable<ColorDTO>>("No colors found", 404);
+                var data = _mapper.Map<IEnumerable<ColorDTO>>(colors);
+                return new ServiceResult<IEnumerable<ColorDTO>>(data);
             }
             catch (Exception ex)
             {
-                return new ServiceResult<IEnumerable<GetColorDTO>>(ex.Message, 500);
+                return new ServiceResult<IEnumerable<ColorDTO>>(ex.Message, 500);
             }
             
 
         }
 
-        public async Task<ServiceResult<IEnumerable<GetColorDTO>>> SearchColors(string name)
+        public async Task<ServiceResult<IEnumerable<ColorDTO>>> SearchColors(string name)
         {
             try
             {
                 var colors = await _unitOfWork.ColorRepository.FindAsync(p => p.Name.StartsWith(name));
                 if (colors.Count() == 0)
-                    return new ServiceResult<IEnumerable<GetColorDTO>>("No match found", 404);
-                var data = _mapper.Map<IEnumerable<GetColorDTO>>(colors);
-                return new ServiceResult<IEnumerable<GetColorDTO>>(data);
+                    return new ServiceResult<IEnumerable<ColorDTO>>("No match found", 404);
+                var data = _mapper.Map<IEnumerable<ColorDTO>>(colors);
+                return new ServiceResult<IEnumerable<ColorDTO>>(data);
             }
             catch (Exception ex)
             {
-                return new ServiceResult<IEnumerable<GetColorDTO>>(ex.Message,500);
+                return new ServiceResult<IEnumerable<ColorDTO>>(ex.Message,500);
             }
            
         }
 
-        public async Task<ServiceResult<GetColorDTO>> UpdateColor(UpdateColorDTO color)
+        public async Task<ServiceResult<ColorDTO>> UpdateColor(UpdateColorDTO color)
         {
             try
             {
                 if (await _unitOfWork.ColorRepository.AnyAsync(p => p.Name == color.ColorName))
-                    return new ServiceResult<GetColorDTO>("A color with the same name already exists", 409);
+                    return new ServiceResult<ColorDTO>("A color with the same name already exists", 409);
                 var oldColor = await _unitOfWork.ColorRepository.GetById(color.Id);
                 if (oldColor == null)
-                    return new ServiceResult<GetColorDTO>($"No color with id {color.Id} found", 404);
+                    return new ServiceResult<ColorDTO>($"No color with id {color.Id} found", 404);
 
                 oldColor.Name = color.ColorName;
                 var updatedColor = _unitOfWork.ColorRepository.Update(oldColor);
                 await _unitOfWork.Complete();
-                var data = _mapper.Map<GetColorDTO>(updatedColor);
-                return new ServiceResult<GetColorDTO>(data);
+                var data = _mapper.Map<ColorDTO>(updatedColor);
+                return new ServiceResult<ColorDTO>(data);
             }
             catch (Exception ex)
             {
-                return new ServiceResult<GetColorDTO>(ex.Message, 500);
+                return new ServiceResult<ColorDTO>(ex.Message, 500);
             }
         }
     }

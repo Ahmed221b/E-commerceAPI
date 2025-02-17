@@ -107,7 +107,7 @@ namespace E_Commerce.Controllers
         }
         
         
-        [HttpPost]
+        [HttpDelete]
         [Route(nameof(DeleteCategory))]
         public async Task<ActionResult<Response<string>>> DeleteCategory(int id)
         {

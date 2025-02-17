@@ -18,8 +18,23 @@ namespace E_Commerce.Core
             CreateMap<Product, CategpryProductDTO>().ReverseMap();
             CreateMap<Category,GetCategoryDTO>().ReverseMap();
             CreateMap<Category,GetCategoryListDTO>().ReverseMap();
-            CreateMap<Color, GetColorDTO>().ReverseMap();
-            CreateMap<Product,AddProductDTO>().ReverseMap();
+            CreateMap<Color, ColorDTO>().ReverseMap();
+
+
+
+            CreateMap<AddProductDTO, Product>()
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => Convert.FromBase64String(src.ImageBase64)))
+                .ReverseMap();
+
+            CreateMap<Product, GetProductDTO>()
+                .ForMember(dest => dest.ImageBase64, opt => opt.MapFrom(src => Convert.ToBase64String(src.Image))) // Convert byte array to Base64 string
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.Name))
+                .ForMember(dest => dest.Colors, opt => opt.MapFrom(src => src.ProductColors
+                    .Where(pc => pc.Color != null)
+                    .Select(pc => pc.Color.Name)
+                    .ToList()));
         }
     }
+    
+    
 }
