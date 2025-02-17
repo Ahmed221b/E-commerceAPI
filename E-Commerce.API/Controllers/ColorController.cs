@@ -46,10 +46,12 @@ namespace E_Commerce.Controllers
             if (result.StatusCode == 404)
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return NotFound(response);
             }
             else if (result.StatusCode == 500)
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
             response.Data = result.Data;
             return Ok(response);
@@ -64,10 +66,12 @@ namespace E_Commerce.Controllers
             if (result.StatusCode == 404)
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return NotFound(response);
             }
             else if (result.StatusCode == 500)
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
             response.Data = "Color deleted successfully";
             return Ok(response);
@@ -82,10 +86,12 @@ namespace E_Commerce.Controllers
             if (result.StatusCode == 404)
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return NotFound(response);
             }
             else if (result.StatusCode == 500)
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
     
             response.Data = result.Data;
@@ -102,10 +108,12 @@ namespace E_Commerce.Controllers
             if (result.StatusCode == 404)
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return NotFound(response);
             }
             else if (result.StatusCode == 500)
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
             response.Data = result.Data;
             return Ok(response);
