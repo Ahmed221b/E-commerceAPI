@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using E_Commerce.Core.DTO.Product;
 using E_Commerce.Core.Interfaces.Services;
+using E_Commerce.Core.Shared;
 using E_Commerce.Models;
 
 namespace E_Commerce.Core.Services
@@ -20,54 +21,42 @@ namespace E_Commerce.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<GetProductDTO> AddProduct(AddProductDTO product)
-        {
-            var newProduct = new Product
-            {
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                CategoryId = product.CategoryId
-            };
-            
-            var addedProduct = await _unitOfWork.ProductRepository.AddAsync(newProduct);
-            await _unitOfWork.Complete();
-            return _mapper.Map<GetProductDTO>(addedProduct);
-        }
-
-        public Task<bool> DeleteProduct(int id)
+        public Task<ServiceResult<GetProductDTO>> AddProduct(AddProductDTO product)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<GetProductDTO>> FilterByPriceRange(double from, double to)
+        public Task<ServiceResult<bool>> DeleteProduct(int id)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<GetProductDTO>> GetAllProducts()
-        {
-            var products = await _unitOfWork.ProductRepository.GetAll();
-            return _mapper.Map<IEnumerable<GetProductDTO>>(products);
-        }
-
-        public async Task<GetProductDTO> GetProductById(int id)
-        {
-            var product = await _unitOfWork.ProductRepository.GetById(id);
-            return _mapper.Map<GetProductDTO>(product);
-        }
-
-        public Task<IEnumerable<GetProductDTO>> GetProductsByCategory(int categoryId)
+        public Task<ServiceResult<IEnumerable<GetProductDTO>>> FilterByPriceRange(double from, double to)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<GetProductDTO>> SearchProducts(string name)
+        public Task<ServiceResult<IEnumerable<GetProductDTO>>> GetAllProducts()
         {
             throw new NotImplementedException();
         }
 
-        public Task<GetProductDTO> UpdateProduct(UpdateProductDTO product)
+        public Task<ServiceResult<GetProductDTO>> GetProductById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult<IEnumerable<GetProductDTO>>> GetProductsByCategory(int categoryId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult<IEnumerable<GetProductDTO>>> SearchProducts(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult<GetProductDTO>> UpdateProduct(UpdateProductDTO product)
         {
             throw new NotImplementedException();
         }
