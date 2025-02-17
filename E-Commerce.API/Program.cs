@@ -1,6 +1,8 @@
 
+using System.Text;
 using API.Filters;
 using E_Commerce.Core;
+using E_Commerce.Core.Configuration;
 using E_Commerce.Core.Interfaces;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Services;
@@ -11,6 +13,7 @@ using E_Commerce.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace E_Commerce
 {
@@ -30,9 +33,35 @@ namespace E_Commerce
                     .UseLazyLoadingProxies();
                 }
             );
+
+            //Configure JWT Authentication
+            var key = Environment.GetEnvironmentVariable("JWT_KEY");
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "Bearer";
+                options.DefaultChallengeScheme = "Bearer";
+            }).AddJwtBearer(o =>
+            {
+                o.RequireHttpsMetadata = true;
+                o.SaveToken = true;
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                };
+            });
+
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDBContext>()
                 .AddDefaultTokenProviders();
+
+            //Map the JWT configuration section to the JWT class
+            builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.AddControllers(
                 options =>
                 {
@@ -56,9 +85,8 @@ namespace E_Commerce
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

@@ -16,6 +16,7 @@ namespace E_Commerce.Controllers
         {
             _productService = productService;
         }
+
         [HttpPost]
         [Route(nameof(AddProduct))]
         public async Task<ActionResult<Response<GetProductDTO>>> AddProduct(AddProductDTO product)
@@ -30,7 +31,6 @@ namespace E_Commerce.Controllers
             response.Data = result.Data;
             return Ok(response);
         }
-
 
         [HttpGet]
         [Route(nameof(GetProductById))]
