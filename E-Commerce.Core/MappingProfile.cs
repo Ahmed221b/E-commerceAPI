@@ -7,7 +7,9 @@ using AutoMapper;
 using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.DTO.Color;
 using E_Commerce.Core.DTO.Product;
+using E_Commerce.Core.DTO.Role;
 using E_Commerce.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace E_Commerce.Core
 {
@@ -33,6 +35,15 @@ namespace E_Commerce.Core
                     .Where(pc => pc.Color != null)
                     .Select(pc => pc.Color.Name)
                     .ToList()));
+
+            CreateMap<ApplicationUser, UsersInRoleDTO>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+                .ReverseMap();
+
+            CreateMap<IdentityRole,GetRoleDTO>()
+                .ForMember(dest => dest.RoleName,opt => opt.MapFrom(src => src.Name))
+                .ReverseMap();
         }
     }
     
