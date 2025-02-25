@@ -1,4 +1,5 @@
-﻿using E_Commerce.Models;
+﻿using E_Commerce.Core.Models;
+using E_Commerce.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -122,7 +123,11 @@ namespace E_Commerce.Data
                 .WithMany(p => p.WishlistItems)
                 .HasForeignKey(p => p.WishlistId);
 
-
+            //One To Many (ApplicationUser - RefreshTokens)
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(p => p.RefreshTokens)
+                .WithOne(p => p.ApplicationUser)
+                .HasForeignKey(p => p.ApplicationUserId);
         }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Customer> Customers { get; set; }
@@ -137,5 +142,7 @@ namespace E_Commerce.Data
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
     }
 }

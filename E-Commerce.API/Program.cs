@@ -11,6 +11,9 @@ using E_Commerce.EF;
 using E_Commerce.EF.Repositories;
 using E_Commerce.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -62,6 +65,8 @@ namespace E_Commerce
 
             //Map the JWT configuration section to the JWT class
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
+            builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
             builder.Services.AddControllers(
                 options =>
                 {
@@ -76,7 +81,17 @@ namespace E_Commerce
             //Injecting Services and Repositories.
             builder.Services.AddRepositories();
             builder.Services.AddServices();
-            
+
+            //Adding the UrlHelpers used inside Services
+            builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
+            builder.Services.AddScoped<IUrlHelper>(x =>
+            {
+                var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
+                return new UrlHelper(actionContext);
+            });
+            builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
