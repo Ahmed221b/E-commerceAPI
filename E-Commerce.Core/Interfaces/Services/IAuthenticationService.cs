@@ -12,5 +12,8 @@ namespace E_Commerce.Core.Interfaces.Services
     {
         Task<ServiceResult<string>> RegisterAsync(RegisterDTO registerDTO);
         Task<ServiceResult<string>> ConfirmEmail(string email);
+        Task<ServiceResult<AuthModel>> LoginAsync(LoginDTO loginDTO);
+        Task<ServiceResult<AuthModel>> GenerateNewTokenByRefreshTokenAsync (string refreshToken);
+        Task<ServiceResult<string>> RevokeTokenAsync (string refreshToken);
     }
 }

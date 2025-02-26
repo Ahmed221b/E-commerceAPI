@@ -44,11 +44,11 @@ namespace E_Commerce.Core.Services
             var model = new AuthModel();
             try
             {
-                //if (await _userManager.FindByEmailAsync(registerDTO.Email) != null)
-                //{
-                //    model = new AuthModel("Email Already Exists");
-                //    return new ServiceResult<string>(model.Message, (int)HttpStatusCode.Conflict);
-                //}
+                if (await _userManager.FindByEmailAsync(registerDTO.Email) != null)
+                {
+                    model = new AuthModel("Email Already Exists");
+                    return new ServiceResult<string>(model.Message, (int)HttpStatusCode.Conflict);
+                }
 
                 ApplicationUser newUser = GenerateApplicationUserObject(registerDTO);
                 
@@ -91,7 +91,6 @@ namespace E_Commerce.Core.Services
            
 
         }
-
         public async Task<ServiceResult<string>> ConfirmEmail(string email)
         {
             try
@@ -100,6 +99,10 @@ namespace E_Commerce.Core.Services
                 if (user == null)
                 {
                     return new ServiceResult<string>("User Not Found", (int)HttpStatusCode.NotFound);
+                }
+                if (await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    return new ServiceResult<string>("Email is already confirmed", (int)HttpStatusCode.Conflict);
                 }
                 var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
@@ -124,7 +127,115 @@ namespace E_Commerce.Core.Services
                 return new ServiceResult<string>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
             }
         }
+        public async Task<ServiceResult<AuthModel>> LoginAsync(LoginDTO loginDTO)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(loginDTO.Email);
+                if (user == null || !await _userManager.CheckPasswordAsync(user, loginDTO.Password))
+                {
+                    return new ServiceResult<AuthModel>("Invalid Email Or Password", (int)HttpStatusCode.Unauthorized);
+                }
+                if (!await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    return new ServiceResult<AuthModel>("Please confirm your email first", (int)HttpStatusCode.Unauthorized);
+                }
+                var token = await GenerateToken(user);
+                var authModel = new AuthModel
+                {
+                    Username = user.UserName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Token = token,
+                    IsAuthenticated = true
+                };
 
+                //If there is an active refresh token, return it, else generate a new one
+                var activeRefreshToken = user.RefreshTokens.FirstOrDefault(p => p.IsActive);
+                if (activeRefreshToken != null)
+                {
+                    authModel.RefreshToken = activeRefreshToken.Token;
+                    authModel.RefreshTokenExpires = activeRefreshToken.ExpiresOn;
+                }
+                else
+                {
+                    var refreshToken = GenerateRefreshToken();
+                    user.RefreshTokens.Add(refreshToken);
+                    authModel.RefreshToken = refreshToken.Token;
+                    authModel.RefreshTokenExpires = refreshToken.ExpiresOn;
+                }
+                await _userManager.UpdateAsync(user);
+
+                return new ServiceResult<AuthModel>(authModel);
+
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<AuthModel>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+        public async Task<ServiceResult<AuthModel>> GenerateNewTokenByRefreshTokenAsync(string refreshToken)
+        {
+            try
+            {
+                var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(u => u.Token == refreshToken));
+                if (user == null)
+                {
+                    return new ServiceResult<AuthModel>("Invalid Refresh Token", (int)HttpStatusCode.Unauthorized);
+                }
+
+                var oldRefreshToken = user.RefreshTokens.Single(u => u.Token == refreshToken);
+                if (!oldRefreshToken.IsActive)
+                {
+                    return new ServiceResult<AuthModel>("Refresh Token Expired", (int)HttpStatusCode.Unauthorized);
+                }
+
+                oldRefreshToken.RevokedOn = DateTime.UtcNow;
+                var newJWT = await GenerateToken(user);
+                var newRefreshToken = GenerateRefreshToken();
+                user.RefreshTokens.Add(newRefreshToken);
+                await _userManager.UpdateAsync(user);
+
+                return new ServiceResult<AuthModel>(new AuthModel
+                {
+                    Username = user.UserName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Token = newJWT,
+                    IsAuthenticated = true,
+                    RefreshToken = newRefreshToken.Token,
+                    RefreshTokenExpires = newRefreshToken.ExpiresOn
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<AuthModel>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+        public async Task<ServiceResult<string>> RevokeTokenAsync(string refreshToken)
+        {
+            try
+            {
+                var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(u => u.Token == refreshToken));
+                if (user == null)
+                {
+                    return new ServiceResult<string>("Invalid Refresh Token", (int)HttpStatusCode.Unauthorized);
+                }
+                var token = user.RefreshTokens.Single(u => u.Token == refreshToken);
+                if (!token.IsActive)
+                {
+                    return new ServiceResult<string>("Refresh Token Expired", (int)HttpStatusCode.Unauthorized);
+                }
+                token.RevokedOn = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
+                return new ServiceResult<string>("Token Revoked Successfully");
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<string>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
+            }
+        }
         private ApplicationUser GenerateApplicationUserObject(RegisterDTO registerDTO)
         {
             if (!registerDTO.IsAdmin)
@@ -153,8 +264,6 @@ namespace E_Commerce.Core.Services
 
             }
         }
-
-
         private async Task<string> GenerateToken(ApplicationUser user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
