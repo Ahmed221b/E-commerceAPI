@@ -77,8 +77,7 @@ namespace E_Commerce.Core.Services
 
                 if (serviceResult.StatusCode == (int)HttpStatusCode.InternalServerError)
                 {
-                    model = new AuthModel(serviceResult.Message);
-                    return new ServiceResult<string>(model.Message, (int)HttpStatusCode.InternalServerError);
+                    return new ServiceResult<string>(serviceResult.Message, (int)HttpStatusCode.InternalServerError);
                 }
 
                 return new ServiceResult<string>("User Registered Successfully, a mail was sent to you to confirm mail so you can login");
@@ -236,6 +235,100 @@ namespace E_Commerce.Core.Services
                 return new ServiceResult<string>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
             }
         }
+        public async Task<ServiceResult<string>> ChangePassword(ChangePasswordDTO changePasswordDTO)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(changePasswordDTO.Email);
+                if (user == null)
+                {
+                    return new ServiceResult<string>("User Not Found", (int)HttpStatusCode.NotFound);
+                }
+                var isPasswordValid = await _userManager.CheckPasswordAsync(user, changePasswordDTO.CurrentPassword);
+                if (!isPasswordValid)
+                {
+                    return new ServiceResult<string>("Invalid Old Password", (int)HttpStatusCode.Unauthorized);
+                }
+
+                var result = await _userManager.ChangePasswordAsync(user, changePasswordDTO.CurrentPassword, changePasswordDTO.NewPassword);
+                if (result.Succeeded)
+                {
+                    user.RefreshTokens.Clear();
+                    await _userManager.UpdateAsync(user);
+                    return new ServiceResult<string>("Password Changed Successfully");
+                }
+                else
+                {
+                    StringBuilder resultErrors = new StringBuilder();
+                    foreach (var error in result.Errors)
+                    {
+                        resultErrors.Append(error.Description + ", ");
+                    }
+                    return new ServiceResult<string>("Changing password failed: " + resultErrors.ToString(), (int)HttpStatusCode.InternalServerError);
+                }
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<string>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+        public async Task<ServiceResult<string>> ForgotPassword(string email)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    return new ServiceResult<string>("User Not Found", (int)HttpStatusCode.NotFound);
+                }
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetLink = _linkGenerator.GetUriByName(
+                         _httpContextAccessor.HttpContext,
+                         "ResetPasswordData",
+                         new { Email = user.Email, Token = resetToken });
+                var emailBody = $"Please reset your password by clicking this link: <a href='{resetLink}'>link</a>";
+                var serviceResult = await _mailService.SendEmailAsync(new List<string> { user.Email },"Reset Password", emailBody, true);
+                if (serviceResult.StatusCode == (int)HttpStatusCode.InternalServerError)
+                {
+                    return new ServiceResult<string>(serviceResult.Message, (int)HttpStatusCode.InternalServerError);
+                }
+                return new ServiceResult<string>("A link was sent to your mail to reset password");
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<string>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+        public async Task<ServiceResult<string>> ResetPassword(ResetPasswordDTO resetPasswordDTO)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(resetPasswordDTO.Email);
+                if (user == null)
+                {
+                    return new ServiceResult<string>("User not found", (int)HttpStatusCode.NotFound);
+                }
+
+                var resetResult = await _userManager.ResetPasswordAsync(user, resetPasswordDTO.ResetToken, resetPasswordDTO.NewPassword);
+
+                if (!resetResult.Succeeded)
+                {
+                    StringBuilder errors = new StringBuilder();
+                    foreach (var error in resetResult.Errors)
+                    {
+                        errors.Append(error.Description + ", ");
+                    }
+                    return new ServiceResult<string>("Reset password failed: " + errors.ToString(), (int)HttpStatusCode.InternalServerError);
+                }
+
+                return new ServiceResult<string>("Password reset successfully.");
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<string>("Something went wrong: " + ex.Message, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         private ApplicationUser GenerateApplicationUserObject(RegisterDTO registerDTO)
         {
             if (!registerDTO.IsAdmin)
