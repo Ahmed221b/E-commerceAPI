@@ -69,28 +69,20 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<AuthModel>();
             var result = await _authenticationService.LoginAsync(loginDTO);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = (int)HttpStatusCode.NotFound, Message = result.Message });
-                return NotFound(response);
+                response.Data = result.Data;
+
+                if (!string.IsNullOrEmpty(result.Data.RefreshToken))
+                    SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpires);
+
+                return Ok(response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.Unauthorized)
+            else
             {
-                response.Errors.Add(new Error { Code = (int)HttpStatusCode.Unauthorized, Message = result.Message });
-                return Unauthorized(response);
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = (int)HttpStatusCode.InternalServerError, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-
-            response.Data = result.Data;
-
-            if (!string.IsNullOrEmpty(result.Data.RefreshToken))
-                SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpires);
-
-            return Ok(response);
         }
 
         [HttpGet]
@@ -136,6 +128,80 @@ namespace E_Commerce.Controllers
             }
             response.Data = result.Data;
             return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("ChangePassword")]
+        public async Task<ActionResult<Response<string>>> ChangePassword(ChangePasswordDTO changePasswordDTO)
+        {
+            var response = new Response<string>();
+            var result = await _authenticationService.ChangePassword(changePasswordDTO);
+            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return NotFound(response);
+            }
+            else if (result.StatusCode == (int)HttpStatusCode.Unauthorized)
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return Unauthorized(response);
+            }
+            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+            response.Data = result.Data;
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("ForgotPassword")]
+        public async Task<ActionResult<Response<string>>> ForgotPassword(string email)
+        {
+            var response = new Response<string>();
+            var result = await _authenticationService.ForgotPassword(email);
+            if (result.StatusCode == (int)StatusCodes.Status200OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
+            }
+        
+        }
+
+        [HttpGet]
+        [Route("ResetPasswordData", Name = "ResetPasswordData")]
+        public IActionResult ResetPasswordData(string email, string token)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
+            {
+                return BadRequest(new { message = "Invalid reset link" });
+            }
+
+            return Ok(new { email, token });
+        }
+
+        [HttpPost]
+        [Route("ResetPassword")]
+        public async Task<ActionResult<Response<string>>> ResetPassword(ResetPasswordDTO resetPasswordDTO)
+        {
+            var response = new Response<string>();
+            var result = await _authenticationService.ResetPassword(resetPasswordDTO);
+            if (result.StatusCode == (int)StatusCodes.Status200OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
+            }
         }
 
         private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)

@@ -15,5 +15,8 @@ namespace E_Commerce.Core.Interfaces.Services
         Task<ServiceResult<AuthModel>> LoginAsync(LoginDTO loginDTO);
         Task<ServiceResult<AuthModel>> GenerateNewTokenByRefreshTokenAsync (string refreshToken);
         Task<ServiceResult<string>> RevokeTokenAsync (string refreshToken);
+        Task<ServiceResult<string>> ChangePassword(ChangePasswordDTO changePasswordDTO);
+        Task<ServiceResult<string>> ForgotPassword(string email);
+        Task<ServiceResult<string>> ResetPassword(ResetPasswordDTO resetPasswordDTO);
     }
 }
