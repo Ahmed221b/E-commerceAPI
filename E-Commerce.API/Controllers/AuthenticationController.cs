@@ -25,17 +25,14 @@ namespace E_Commerce.Controllers
             var result = await _authenticationService.RegisterAsync(registerDTO);
             if (result.StatusCode == (int)HttpStatusCode.Conflict)
             {
-                response.Errors.Add(new Error { Code = (int)HttpStatusCode.Conflict, Message = result.Message });
-                return Conflict(response);
+                response.Data = result.Data;
+                return Ok(response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            else
             {
-                response.Errors.Add(new Error { Code= (int)HttpStatusCode.InternalServerError, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Errors.Add(new Error { Code= result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
             }
-            response.Data = result.Data;
-            return Ok(response);
-
         }
 
         [HttpGet]
@@ -44,23 +41,17 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<string>();
             var result = await _authenticationService.ConfirmEmail(email);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else 
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.Conflict)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return Conflict(response);
-            }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
+            
         }
 
         [HttpPost]
@@ -75,7 +66,6 @@ namespace E_Commerce.Controllers
 
                 if (!string.IsNullOrEmpty(result.Data.RefreshToken))
                     SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpires);
-
                 return Ok(response);
             }
             else
@@ -93,20 +83,19 @@ namespace E_Commerce.Controllers
             var refreshToken = Request.Cookies["refreshToken"];
             var result = await _authenticationService.GenerateNewTokenByRefreshTokenAsync(refreshToken);
 
-            if (result.StatusCode == (int)HttpStatusCode.Unauthorized)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = (int)HttpStatusCode.Unauthorized, Message = result.Message });
-                return Unauthorized(response);
+                response.Data = result.Data;
+                if (!string.IsNullOrEmpty(result.Data.RefreshToken))
+                    SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpires);
+                return Ok(response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            else 
             {
-                response.Errors.Add(new Error { Code = (int)HttpStatusCode.InternalServerError, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
             }
-            response.Data = result.Data;
-            if (!string.IsNullOrEmpty(result.Data.RefreshToken))
-                SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpires);
-            return Ok(response);
+            
         }
 
         [HttpPost]
@@ -115,19 +104,20 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<string>();
             var refreshToken = token.RefreshToken ?? Request.Cookies["refreshToken"];
-            var result = await _authenticationService.RevokeTokenAsync(refreshToken);
-            if (result.StatusCode == (int)HttpStatusCode.Unauthorized)
+            var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+            var accessToken = authHeader?.Split(" ").Last();
+            var result = await _authenticationService.RevokeTokenAsync(refreshToken, accessToken);
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = (int)HttpStatusCode.Unauthorized, Message = result.Message });
-                return Unauthorized(response);
+                response.Data = result.Data;
+                return Ok(response); ;
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            else
             {
-                response.Errors.Add(new Error { Code = (int)HttpStatusCode.InternalServerError, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
             }
-            response.Data = result.Data;
-            return Ok(response);
+            
         }
 
         [HttpPost]
@@ -136,23 +126,17 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<string>();
             var result = await _authenticationService.ChangePassword(changePasswordDTO);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.Unauthorized)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return Unauthorized(response);
-            }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
+            
         }
 
         [HttpPost]
