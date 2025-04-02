@@ -1,4 +1,5 @@
-﻿using E_Commerce.Core.Custom_Exceptions;
+﻿using System.Net;
+using E_Commerce.Core.Custom_Exceptions;
 using E_Commerce.Core.DTO.Color;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
@@ -23,18 +24,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<ColorDTO>();
             var result = await _colorService.CreateColor(color);
-            if (result.StatusCode == 409)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return Conflict(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpGet]
@@ -43,18 +42,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<ColorDTO>();
             var result = await _colorService.GetColor(id);
-            if (result.StatusCode == 404)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpDelete]
@@ -63,18 +60,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<string>();
             var result = await _colorService.DeleteColor(id);
-            if (result.StatusCode == 404)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = "Color Deleted Successfully";
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = "Color deleted successfully";
-            return Ok(response);
         }
 
         [HttpGet]
@@ -83,19 +78,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<IEnumerable<ColorDTO>>();
             var result = await _colorService.GetColors();
-            if (result.StatusCode == 404)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-    
-            response.Data = result.Data;
-            return Ok(response);
 
         }
 
@@ -105,18 +97,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<IEnumerable<ColorDTO>>();
             var result = await _colorService.SearchColors(name);
-            if (result.StatusCode == 404)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpPut]
@@ -125,23 +115,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<ColorDTO>();
             var result = await _colorService.UpdateColor(color);
-            if (result.StatusCode == 404)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 409)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return Conflict(response);
-            }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
     }
 }

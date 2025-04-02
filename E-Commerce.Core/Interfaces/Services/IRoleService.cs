@@ -18,6 +18,8 @@ namespace E_Commerce.Core.Interfaces.Services
         Task<ServiceResult<GetRoleDTO>> AddRole(string roleName);
         Task<ServiceResult<GetRoleDTO>> UpdateRole(string oldroleName,string newRoleName);
         Task<ServiceResult<bool>> DeleteRole(string roleName);
-        
+        Task<ServiceResult<string>> AssignUserToRole(UserRoleDTO addUserToRoleDTO);
+        Task<ServiceResult<string>> RemoveUserFromRole(UserRoleDTO addUserToRoleDTO);
+
     }
 }

@@ -23,18 +23,17 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<GetRoleDTO>();
             var result = await _roleService.AddRole(roleName);
-            if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = result.StatusCode,Message = "Unexpected error happend "+result.Message});
-                return StatusCode(StatusCodes.Status500InternalServerError,response);
+                response.Data = result.Data;
+                return Ok(response);
             }
-            if (result.StatusCode == (int)HttpStatusCode.Conflict)
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return Conflict(response);
+                return StatusCode(result.StatusCode,response);
             }
-            response.Data = result.Data;
-            return Ok(response);
+       
         }
 
         [HttpGet]
@@ -43,18 +42,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<IEnumerable<GetRoleDTO>>();
             var result = await _roleService.GetAllRoles();
-            if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happend " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Data = result.Data;
+                return Ok(response);
             }
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            else
             {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "No roles found" });
-                return NotFound(response);
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
             }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpGet]
@@ -63,18 +60,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<GetRoleDTO>();
             var result = await _roleService.GetRoleByName(roleName);
-            if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happend " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Data = result.Data;
+                return Ok(response);
             }
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpGet]
@@ -83,18 +78,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<GetRoleDTO>();
             var result = await _roleService.GetRoleById(id);
-            if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happend " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Data = result.Data;
+                return Ok(response);
             }
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpDelete]
@@ -103,18 +96,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<string>();
             var result = await _roleService.DeleteRole(roleName);
-            if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happend " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Data = "Role Deleted Successfully";
+                return Ok(response);
             }
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            response.Data = "Role deleted Successfully";
-            return Ok(response);
         }
 
         [HttpPut]
@@ -123,18 +114,52 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<GetRoleDTO>();
             var result = await _roleService.UpdateRole(oldRoleName,newRoleName);
-            if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happend " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Data = result.Data;
+                return Ok(response);
             }
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            response.Data = result.Data;
-            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route(nameof(AssignUserToRole))]
+        public async Task<ActionResult<Response<string>>> AssignUserToRole(UserRoleDTO addUserToRoleDTO)
+        {
+            var response = new Response<string>();
+            var result = await _roleService.AssignUserToRole(addUserToRoleDTO);
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Message;
+                return Ok(response);
+            }
+            else
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
+            }
+        }
+
+        [HttpPost]
+        [Route(nameof(RemoveUserFromRole))]
+        public async Task<ActionResult<Response<string>>> RemoveUserFromRole(UserRoleDTO addUserToRoleDTO)
+        {
+            var response = new Response<string>();
+            var result = await _roleService.RemoveUserFromRole(addUserToRoleDTO);
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Message;
+                return Ok(response);
+            }
+            else
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
+            }
         }
     }
 }

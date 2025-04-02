@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace E_Commerce
 {
@@ -36,6 +37,7 @@ namespace E_Commerce
                     .UseLazyLoadingProxies();
                 }
             );
+   
 
             //Configure JWT Authentication
             var key = Environment.GetEnvironmentVariable("JWT_KEY");
@@ -103,6 +105,7 @@ namespace E_Commerce
                 app.UseSwaggerUI();
             }
             app.UseHttpsRedirection();
+
             app.UseAuthentication();
             app.UseAuthorization();
 

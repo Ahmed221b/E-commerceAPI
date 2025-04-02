@@ -212,7 +212,7 @@ namespace E_Commerce.Core.Services
                 return new ServiceResult<AuthModel>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
             }
         }
-        public async Task<ServiceResult<string>> RevokeTokenAsync(string refreshToken)
+        public async Task<ServiceResult<string>> RevokeTokenAsync(string refreshToken,string accessToken)
         {
             try
             {
@@ -228,6 +228,7 @@ namespace E_Commerce.Core.Services
                 }
                 token.RevokedOn = DateTime.UtcNow;
                 await _userManager.UpdateAsync(user);
+               
                 return new ServiceResult<string>("Token Revoked Successfully");
             }
             catch (Exception ex)
@@ -402,6 +403,5 @@ namespace E_Commerce.Core.Services
             };
         }
 
-        
     }
 }
