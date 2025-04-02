@@ -23,7 +23,7 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<string>();
             var result = await _authenticationService.RegisterAsync(registerDTO);
-            if (result.StatusCode == (int)HttpStatusCode.Conflict)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
                 response.Data = result.Data;
                 return Ok(response);

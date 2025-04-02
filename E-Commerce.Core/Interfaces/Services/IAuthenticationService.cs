@@ -18,5 +18,7 @@ namespace E_Commerce.Core.Interfaces.Services
         Task<ServiceResult<string>> ChangePassword(ChangePasswordDTO changePasswordDTO);
         Task<ServiceResult<string>> ForgotPassword(string email);
         Task<ServiceResult<string>> ResetPassword(ResetPasswordDTO resetPasswordDTO);
+
+
     }
 }

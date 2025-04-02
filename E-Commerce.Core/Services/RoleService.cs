@@ -154,5 +154,86 @@ namespace E_Commerce.Core.Services
                 return new ServiceResult<GetRoleDTO>(e.Message, (int)HttpStatusCode.InternalServerError);
             }
         }
+        public async Task<ServiceResult<string>> AssignUserToRole(UserRoleDTO addUserToRoleDTO)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(addUserToRoleDTO.UserId);
+                if (user == null)
+                {
+                    return new ServiceResult<string>("User Not Found", (int)HttpStatusCode.NotFound);
+                }
+                var role = await _roleManager.FindByNameAsync(addUserToRoleDTO.RoleName);
+                if (role == null)
+                {
+                    return new ServiceResult<string>($"Role {addUserToRoleDTO.RoleName} Not Found", (int)HttpStatusCode.NotFound);
+                }
+
+                var isUserInRole = await _userManager.IsInRoleAsync(user, addUserToRoleDTO.RoleName);
+                if (isUserInRole)
+                {
+                    return new ServiceResult<string>($"User is already in role {addUserToRoleDTO.RoleName}", (int)HttpStatusCode.Conflict);
+                }
+                var result = await _userManager.AddToRoleAsync(user, addUserToRoleDTO.RoleName);
+                if (result.Succeeded)
+                {
+                    return new ServiceResult<string>($"User added to role {addUserToRoleDTO.RoleName}");
+                }
+                else
+                {
+                    StringBuilder resultErrors = new StringBuilder();
+                    foreach (var error in result.Errors)
+                    {
+                        resultErrors.Append(error.Description + ", ");
+                    }
+                    return new ServiceResult<string>(resultErrors.ToString(), (int)HttpStatusCode.InternalServerError);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<string>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        public async Task<ServiceResult<string>> RemoveUserFromRole(UserRoleDTO addUserToRoleDTO)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(addUserToRoleDTO.UserId);
+                if (user == null)
+                {
+                    return new ServiceResult<string>("User Not Found", (int)HttpStatusCode.NotFound);
+                }
+                var role = await _roleManager.FindByNameAsync(addUserToRoleDTO.RoleName);
+                if (role == null)
+                {
+                    return new ServiceResult<string>($"Role {addUserToRoleDTO.RoleName} Not Found", (int)HttpStatusCode.NotFound);
+                }
+                var isUserInRole = _userManager.IsInRoleAsync(user, addUserToRoleDTO.RoleName);
+                if (!isUserInRole.Result)
+                {
+                    return new ServiceResult<string>($"User is not in role {addUserToRoleDTO.RoleName}", (int)HttpStatusCode.Conflict);
+                }
+                var result = await _userManager.RemoveFromRoleAsync(user, addUserToRoleDTO.RoleName);
+                if (result.Succeeded)
+                {
+                    return new ServiceResult<string>($"User removed from role {addUserToRoleDTO.RoleName}");
+                }
+                else
+                {
+                    StringBuilder resultErrors = new StringBuilder();
+                    foreach (var error in result.Errors)
+                    {
+                        resultErrors.Append(error.Description + ", ");
+                    }
+                    return new ServiceResult<string>(resultErrors.ToString(), (int)HttpStatusCode.InternalServerError);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<string>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

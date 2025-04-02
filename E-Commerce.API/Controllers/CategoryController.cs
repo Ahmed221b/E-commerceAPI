@@ -1,4 +1,5 @@
-﻿using E_Commerce.Core.Custom_Exceptions;
+﻿using System.Net;
+using E_Commerce.Core.Custom_Exceptions;
 using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
@@ -25,18 +26,16 @@ namespace E_Commerce.Controllers
             var response = new Response<GetCategoryDTO>();
 
             var result = await _categoryService.AddCategory(dto);
-            if (result.StatusCode == 409)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return Conflict(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
 
@@ -46,18 +45,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<IEnumerable<GetCategoryListDTO>>();
             var result = await _categoryService.GetCategories();
-            if (result.StatusCode == 404)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
 
         }
 
@@ -67,18 +64,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<GetCategoryDTO>();
             var result = await _categoryService.GetCategory(id);
-            if (result.StatusCode == 404)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpPut]
@@ -87,23 +82,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<GetCategoryDTO>();
             var result = await _categoryService.UpdateCategory(dto);
-            if (result.StatusCode == 409)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return Conflict(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 404)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
-            }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
         
         
@@ -113,18 +101,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<string>();
             var result = await _categoryService.DeleteCategory(id);
-            if (result.StatusCode == 404)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = "Category Deleted Successfully";
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = "Category deleted successfully";
-            return Ok(response);
         }
 
         [HttpPost]
@@ -133,18 +119,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<IEnumerable<GetCategoryListDTO>>();
             var result = await _categoryService.SearchCategories(name);
-            if (result.StatusCode == 404)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
-            }   
-            else if (result.StatusCode == 500)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Data = result.Data;
+                return Ok(response);
             }
-            response.Data = result.Data;
-            return Ok(response);
+            else
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
+            }
         }
     }
 }

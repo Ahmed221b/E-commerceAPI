@@ -23,13 +23,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<GetProductDTO>();
             var result = await _productService.AddProduct(product);
-            if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happened " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                response.Data = result.Data;
+                return Ok(response);
             }
-            response.Data = result.Data;
-            return Ok(response);
+            else
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
+            }
         }
 
         [HttpGet]
@@ -38,18 +41,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<GetProductDTO>();
             var result = await _productService.GetProductById(id);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happened " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpGet]
@@ -58,18 +59,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<IEnumerable<GetProductDTO>>();
             var result = await _productService.GetAllProducts();
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happened " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpGet]
@@ -78,18 +77,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<IEnumerable<GetProductDTO>>();
             var result = await _productService.SearchProducts(name);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happened " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpGet]
@@ -98,18 +95,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<IEnumerable<GetProductDTO>>();
             var result = await _productService.GetProductsByCategory(categoryId);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happened " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpGet]
@@ -118,18 +113,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<IEnumerable<GetProductDTO>>();
             var result = await _productService.FilterByPriceRange(from, to);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happened " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
         [HttpDelete]
@@ -138,18 +131,17 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<string>();
             var result = await _productService.DeleteProduct(id);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = "Product Deleted Successfully";
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happened " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = "Product Deleted Successfully";
-            return Ok(response);
+            
         }
 
         [HttpPatch]
@@ -158,18 +150,16 @@ namespace E_Commerce.Controllers
         {
             var response = new Response<GetProductDTO>();
             var result = await _productService.UpdateProduct(product);
-            if (result.StatusCode == (int)HttpStatusCode.NotFound)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
             {
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
-                return NotFound(response);
+                return StatusCode(result.StatusCode, response);
             }
-            else if (result.StatusCode == (int)HttpStatusCode.InternalServerError)
-            {
-                response.Errors.Add(new Error { Code = result.StatusCode, Message = "Unexpected error happened " + result.Message });
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            response.Data = result.Data;
-            return Ok(response);
         }
 
     }
