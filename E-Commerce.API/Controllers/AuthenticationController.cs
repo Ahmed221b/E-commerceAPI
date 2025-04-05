@@ -2,6 +2,8 @@
 using E_Commerce.Core.DTO.Authentication;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -77,6 +79,7 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route("GenerateNewTokenByRefreshToken")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Response<AuthModel>>> GenerateNewTokenByRefreshToken()
         {
             var response = new Response<AuthModel>();
@@ -100,6 +103,7 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route("RevokeToken")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Response<string>>> RevokeToken(RevokeTokenDTO token)
         {
             var response = new Response<string>();

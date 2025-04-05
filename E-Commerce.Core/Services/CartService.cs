@@ -96,6 +96,26 @@ namespace E_Commerce.Core.Services
             }
         }
 
+        public async Task<ServiceResult<bool>> ClearCart(string userId)
+        {
+            try
+            {
+                var cart = await _unitOfWork.CartRepository.GetCartByUserIdAsync(userId);
+                if (cart == null)
+                {
+                    return new ServiceResult<bool>("Cart not found", (int)StatusCodes.Status404NotFound);
+                }
+                cart.CartItems.Clear();
+                _unitOfWork.CartRepository.Update(cart);
+                await _unitOfWork.Complete();
+                return new ServiceResult<bool>(true);
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<bool>("Unexpected error happend: " + ex.Message, (int)StatusCodes.Status500InternalServerError);
+            }
+        }
+
         public async Task<ServiceResult<CartItemsDTO>> GetCartItems(string userId)
         {
             try
@@ -112,6 +132,74 @@ namespace E_Commerce.Core.Services
             catch (Exception ex)
             {
                 return new ServiceResult<CartItemsDTO>("Unexpected error happend: " + ex.Message, (int)StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        public async Task<ServiceResult<CartItemsDTO>> RemoveItemFromCart(string userId,int productId)
+        {
+            try
+            {
+                var cart = await _unitOfWork.CartRepository.GetCartByUserIdAsync(userId);
+                if (cart == null)
+                {
+                    return new ServiceResult<CartItemsDTO>("Cart not found", (int)StatusCodes.Status404NotFound);
+                }
+                var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == productId);
+                if (cartItem == null)
+                {
+                    return new ServiceResult<CartItemsDTO>("Item was not found in the cart", (int)StatusCodes.Status404NotFound);
+                }
+                cart.CartItems.Remove(cartItem);
+                var updatedCart = _unitOfWork.CartRepository.Update(cart);
+                await _unitOfWork.Complete();
+                var result = _mapper.Map<CartItemsDTO>(updatedCart);
+                return new ServiceResult<CartItemsDTO>(result);
+
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<CartItemsDTO>("Unexpected error happend: " + ex.Message, (int)StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        public async Task<ServiceResult<CartItemsDTO>> UpdateItemQuantity(string userId, int productId, int newQuantity)
+        {
+            try
+            {
+                var cart = await _unitOfWork.CartRepository.GetCartByUserIdAsync(userId);
+                if (cart == null)
+                {
+                    return new ServiceResult<CartItemsDTO>("Cart not found", (int)StatusCodes.Status404NotFound);
+                }
+                var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == productId);
+                if (cartItem == null)
+                {
+                    return new ServiceResult<CartItemsDTO>("Item was not found in the cart", (int)StatusCodes.Status404NotFound);
+                }
+                if (newQuantity > cartItem.Quantity)
+                {
+                    var product = await _unitOfWork.ProductRepository.GetById(productId);
+                    if (product == null)
+                    {
+                        return new ServiceResult<CartItemsDTO>("Product not found", (int)StatusCodes.Status404NotFound);
+                    }
+                    if (product.Quantity < newQuantity)
+                    {
+                        return new ServiceResult<CartItemsDTO>("Not enough quantity in stock", (int)StatusCodes.Status400BadRequest);
+                    }
+                    
+                }
+                cartItem.Quantity = newQuantity;
+                var updatedCart = _unitOfWork.CartRepository.Update(cart);
+                await _unitOfWork.Complete();
+                var result = _mapper.Map<CartItemsDTO>(updatedCart);
+                return new ServiceResult<CartItemsDTO>(result);
+
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<CartItemsDTO>("Unexpected error happend: " + ex.Message, (int)StatusCodes.Status500InternalServerError);
+
             }
         }
     }

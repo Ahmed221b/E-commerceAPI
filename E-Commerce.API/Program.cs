@@ -10,6 +10,7 @@ using E_Commerce.EF;
 using E_Commerce.EF.Repositories;
 using E_Commerce.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -59,6 +60,14 @@ namespace E_Commerce
                     ClockSkew = TimeSpan.Zero
                 };
             });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
+
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDBContext>()
@@ -135,7 +144,6 @@ namespace E_Commerce
 
             app.UseAuthentication();
             app.UseAuthorization();
-
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
