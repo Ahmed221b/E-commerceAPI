@@ -200,11 +200,11 @@ namespace E_Commerce.Core.Services
                 }
 
                 // Update the product in the database
-                var updated = _unitOfWork.ProductRepository.Update(product);
+                var updatedProduct = _unitOfWork.ProductRepository.Update(product);
                 await _unitOfWork.Complete();
 
                 // Map the updated product to GetProductDTO
-                var data = _mapper.Map<GetProductDTO>(updated);
+                var data = _mapper.Map<GetProductDTO>(updatedProduct);
                 return new ServiceResult<GetProductDTO>(data);
             }
             catch (Exception e)
