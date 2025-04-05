@@ -38,14 +38,22 @@ namespace E_Commerce.EF
             get => _productRepository == null ? _productRepository = new ProductRepository(_context) : _productRepository;
         }
 
+        private ICartRepository _cartRepository;
+        public ICartRepository CartRepository
+        {
+            get => _cartRepository == null ? _cartRepository = new CartRepository(_context) : _cartRepository;
+        }
+
         public async Task<int> Complete()
         {
             return await _context.SaveChangesAsync();
         }
 
-        public void Dispose()
+
+
+        public async ValueTask DisposeAsync()
         {
-            _context.DisposeAsync();
+            await _context.DisposeAsync();
         }
     }
 }

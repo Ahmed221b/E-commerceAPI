@@ -12,7 +12,7 @@
 
         public double ItemPrice { get; set; }
 
-        public double TotalPriceOfItems { get; set; }
+        public double TotalPriceOfItems => ItemPrice * Quantity;    
 
         public DateTime AddedOn { get; set; }
 

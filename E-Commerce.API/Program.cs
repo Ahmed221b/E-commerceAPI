@@ -1,4 +1,3 @@
-
 using System.Text;
 using API.Filters;
 using E_Commerce.Core;
@@ -10,13 +9,15 @@ using E_Commerce.Data;
 using E_Commerce.EF;
 using E_Commerce.EF.Repositories;
 using E_Commerce.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 
 namespace E_Commerce
@@ -27,29 +28,25 @@ namespace E_Commerce
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
             // Add services to the container.
             builder.Services.AddAutoMapper(typeof(MappingProfile));
-            builder.Services.AddDbContext<ApplicationDBContext>(
-                options =>  
-                {
-                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-                    .UseLazyLoadingProxies();
-                }
-            );
-   
+            builder.Services.AddDbContext<ApplicationDBContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                       .UseLazyLoadingProxies();
+            });
 
-            //Configure JWT Authentication
-            var key = Environment.GetEnvironmentVariable("JWT_KEY");
+            // Configure JWT Authentication
+            var jwtKey = builder.Configuration["JWT:Key"] ?? Environment.GetEnvironmentVariable("JWT_KEY");
             builder.Services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = "Bearer";
-                options.DefaultChallengeScheme = "Bearer";
-            }).AddJwtBearer(o =>
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(o =>
             {
-                o.RequireHttpsMetadata = true;
+                o.RequireHttpsMetadata = builder.Environment.IsProduction();
                 o.SaveToken = true;
-    
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -58,7 +55,7 @@ namespace E_Commerce
                     ValidateLifetime = true,
                     ValidIssuer = builder.Configuration["JWT:Issuer"],
                     ValidAudience = builder.Configuration["JWT:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
                     ClockSkew = TimeSpan.Zero
                 };
             });
@@ -67,26 +64,62 @@ namespace E_Commerce
                 .AddEntityFrameworkStores<ApplicationDBContext>()
                 .AddDefaultTokenProviders();
 
-            //Map the JWT configuration section to the JWT class
+            // Map configuration sections
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
-            builder.Services.AddControllers(
-                options =>
-                {
-                    // Register the filter globally
-                    options.Filters.Add<ValidateModelAttribute>();
-                }
-              );
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<ValidateModelAttribute>();
+            });
 
-            //Injecting Services and Repositories.
+            // Configure Swagger
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "E-Commerce API",
+                    Version = "v1",
+                    Description = "E-Commerce Web API",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Support",
+                        Email = "support@ecommerce.com"
+                    }
+                });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+
+            // Inject application services
             builder.Services.AddRepositories();
             builder.Services.AddServices();
 
-            //Adding the UrlHelpers used inside Services
+            // Add URL helpers
             builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
             builder.Services.AddScoped<IUrlHelper>(x =>
             {
@@ -95,21 +128,26 @@ namespace E_Commerce
             });
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-            app.UseHttpsRedirection();
+            // Configure the HTTP request pipeline
+            app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "E-Commerce API v1");
+                    c.OAuthClientId("swagger-ui");
+                    c.OAuthAppName("Swagger UI");
+                });
+            }
 
+            app.UseHttpsRedirection();
             app.MapControllers();
 
             app.Run();

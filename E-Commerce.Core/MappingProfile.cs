@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using E_Commerce.Core.DTO.Cart;
 using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.DTO.Color;
 using E_Commerce.Core.DTO.Product;
@@ -43,6 +44,20 @@ namespace E_Commerce.Core
 
             CreateMap<IdentityRole,GetRoleDTO>()
                 .ForMember(dest => dest.RoleName,opt => opt.MapFrom(src => src.Name))
+                .ReverseMap();
+
+            CreateMap<CartItem, CartItemDTO>()
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.Product.Id))
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => Convert.ToBase64String(src.Product.Image)))
+                .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.Product.Price))
+                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPriceOfItems))
+                .ReverseMap();
+
+
+            CreateMap<Cart, CartItemsDTO>()
+                .ForMember(dest => dest.CartId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.CartItems, opt => opt.MapFrom(src => src.CartItems))
                 .ReverseMap();
         }
     }
