@@ -19,6 +19,7 @@ namespace E_Commerce.Core
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IMailService, MailService>();
+            services.AddScoped<ICartService, CartService>();
             return services;
         }
     }
