@@ -44,6 +44,23 @@ namespace E_Commerce.EF
             get => _cartRepository == null ? _cartRepository = new CartRepository(_context) : _cartRepository;
         }
 
+        private IPaymentRepository _paymentRepository;
+        public IPaymentRepository PaymentRepository
+        {
+            get => _paymentRepository == null ? _paymentRepository = new PaymentRepository(_context) : _paymentRepository;
+        }
+
+        private IOrderRepository _orderRepository;
+        public IOrderRepository OrderRepository
+        {
+            get => _orderRepository == null ? _orderRepository = new OrderRepository(_context) : _orderRepository;
+        }
+
+        private IWishlistRepository _wishlistRepository;
+        public IWishlistRepository WishlistRepository
+        {
+            get => _wishlistRepository == null ? _wishlistRepository = new WishlistRepository(_context) : _wishlistRepository;
+        }
         public async Task<int> Complete()
         {
             return await _context.SaveChangesAsync();

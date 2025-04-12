@@ -128,6 +128,23 @@ namespace E_Commerce.Data
                 .HasMany(p => p.RefreshTokens)
                 .WithOne(p => p.ApplicationUser)
                 .HasForeignKey(p => p.ApplicationUserId);
+
+            //One To Many (Customer - Payment)
+            modelBuilder.Entity<Customer>()
+                .HasMany(p => p.Payments)
+                .WithOne(p => p.Customer)
+                .HasForeignKey(p => p.CustomerId);
+
+            //One To One (Order - Payment)
+            modelBuilder.Entity<Order>()
+                .HasOne(p => p.Payment)
+                .WithOne(p => p.Order)
+                .HasForeignKey<Payment>(p => p.OrderId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+
+
         }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Customer> Customers { get; set; }
@@ -143,6 +160,7 @@ namespace E_Commerce.Data
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
     }
 }

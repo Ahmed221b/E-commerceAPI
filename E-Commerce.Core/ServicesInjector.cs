@@ -20,6 +20,9 @@ namespace E_Commerce.Core
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IMailService, MailService>();
             services.AddScoped<ICartService, CartService>();
+            services.AddScoped<IPaymentService, StripePaymentService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IWishlistService, WishlistService>();
             return services;
         }
     }

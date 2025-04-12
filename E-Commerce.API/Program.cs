@@ -20,6 +20,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using Stripe;
 
 namespace E_Commerce
 {
@@ -76,6 +77,10 @@ namespace E_Commerce
             // Map configuration sections
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+
+
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
             builder.Services.AddControllers(options =>
             {

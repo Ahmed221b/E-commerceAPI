@@ -1,4 +1,6 @@
-﻿namespace E_Commerce.Models
+﻿using E_Commerce.Core.Models;
+
+namespace E_Commerce.Models
 {
     public class Customer : ApplicationUser
     {
@@ -6,10 +8,13 @@
         public DateOnly DataOfBirth { get; set; }
         public int WishlidtId { get; set; }
         public int CartId { get; set; }
+        public string StripeCustomerId { get; set; }
 
         public virtual Cart Cart { get; set; }
         public virtual Wishlist Wishlist { get; set; }
         public virtual ICollection<CustomerReview> CustomerReviews { get; set; } = new List<CustomerReview>();
         public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
     }
 }

@@ -21,9 +21,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route("Register")]
-        public async Task<ActionResult<Response<string>>> Register(RegisterDTO registerDTO)
+        public async Task<ActionResult<CommonResponse<string>>> Register(RegisterDTO registerDTO)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _authenticationService.RegisterAsync(registerDTO);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -39,9 +39,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route("ConfirmEmail", Name = "ConfirmEmail")]
-        public async Task<ActionResult<Response<string>>> ConfirmEmail(string email)
+        public async Task<ActionResult<CommonResponse<string>>> ConfirmEmail(string email)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _authenticationService.ConfirmEmail(email);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -58,9 +58,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route("Login")]
-        public async Task<ActionResult<Response<AuthModel>>> Login(LoginDTO loginDTO)
+        public async Task<ActionResult<CommonResponse<AuthModel>>> Login(LoginDTO loginDTO)
         {
-            var response = new Response<AuthModel>();
+            var response = new CommonResponse<AuthModel>();
             var result = await _authenticationService.LoginAsync(loginDTO);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -80,9 +80,9 @@ namespace E_Commerce.Controllers
         [HttpGet]
         [Route("GenerateNewTokenByRefreshToken")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<Response<AuthModel>>> GenerateNewTokenByRefreshToken()
+        public async Task<ActionResult<CommonResponse<AuthModel>>> GenerateNewTokenByRefreshToken()
         {
-            var response = new Response<AuthModel>();
+            var response = new CommonResponse<AuthModel>();
             var refreshToken = Request.Cookies["refreshToken"];
             var result = await _authenticationService.GenerateNewTokenByRefreshTokenAsync(refreshToken);
 
@@ -104,9 +104,9 @@ namespace E_Commerce.Controllers
         [HttpPost]
         [Route("RevokeToken")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<Response<string>>> RevokeToken(RevokeTokenDTO token)
+        public async Task<ActionResult<CommonResponse<string>>> RevokeToken(RevokeTokenDTO token)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var refreshToken = token.RefreshToken ?? Request.Cookies["refreshToken"];
             var authHeader = Request.Headers["Authorization"].FirstOrDefault();
             var accessToken = authHeader?.Split(" ").Last();
@@ -126,9 +126,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route("ChangePassword")]
-        public async Task<ActionResult<Response<string>>> ChangePassword(ChangePasswordDTO changePasswordDTO)
+        public async Task<ActionResult<CommonResponse<string>>> ChangePassword(ChangePasswordDTO changePasswordDTO)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _authenticationService.ChangePassword(changePasswordDTO);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -145,9 +145,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route("ForgotPassword")]
-        public async Task<ActionResult<Response<string>>> ForgotPassword(string email)
+        public async Task<ActionResult<CommonResponse<string>>> ForgotPassword(string email)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _authenticationService.ForgotPassword(email);
             if (result.StatusCode == (int)StatusCodes.Status200OK)
             {
@@ -176,9 +176,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route("ResetPassword")]
-        public async Task<ActionResult<Response<string>>> ResetPassword(ResetPasswordDTO resetPasswordDTO)
+        public async Task<ActionResult<CommonResponse<string>>> ResetPassword(ResetPasswordDTO resetPasswordDTO)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _authenticationService.ResetPassword(resetPasswordDTO);
             if (result.StatusCode == (int)StatusCodes.Status200OK)
             {
