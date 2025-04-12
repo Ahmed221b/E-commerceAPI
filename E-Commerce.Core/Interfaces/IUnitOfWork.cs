@@ -15,6 +15,9 @@ namespace E_Commerce.Core
         IColorRepository ColorRepository { get; }
         IProductRepository ProductRepository { get; }
         ICartRepository CartRepository { get; }
+        IPaymentRepository PaymentRepository { get; }
+        IOrderRepository OrderRepository { get; }
+        IWishlistRepository WishlistRepository { get; }
         Task<int> Complete();
     }
 }

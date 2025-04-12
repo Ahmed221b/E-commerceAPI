@@ -19,9 +19,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(AddProduct))]
-        public async Task<ActionResult<Response<GetProductDTO>>> AddProduct(AddProductDTO product)
+        public async Task<ActionResult<CommonResponse<GetProductDTO>>> AddProduct(AddProductDTO product)
         {
-            var response = new Response<GetProductDTO>();
+            var response = new CommonResponse<GetProductDTO>();
             var result = await _productService.AddProduct(product);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -37,9 +37,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetProductById))]
-        public async Task<ActionResult<Response<GetProductDTO>>> GetProductById(int id)
+        public async Task<ActionResult<CommonResponse<GetProductDTO>>> GetProductById(int id)
         {
-            var response = new Response<GetProductDTO>();
+            var response = new CommonResponse<GetProductDTO>();
             var result = await _productService.GetProductById(id);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -55,9 +55,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetAllProducts))]
-        public async Task<ActionResult<Response<IEnumerable<GetProductDTO>>>> GetAllProducts()
+        public async Task<ActionResult<CommonResponse<IEnumerable<GetProductDTO>>>> GetAllProducts()
         {
-            var response = new Response<IEnumerable<GetProductDTO>>();
+            var response = new CommonResponse<IEnumerable<GetProductDTO>>();
             var result = await _productService.GetAllProducts();
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -73,9 +73,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(SearchProducts))]
-        public async Task<ActionResult<Response<IEnumerable<GetProductDTO>>>> SearchProducts(string name)
+        public async Task<ActionResult<CommonResponse<IEnumerable<GetProductDTO>>>> SearchProducts(string name)
         {
-            var response = new Response<IEnumerable<GetProductDTO>>();
+            var response = new CommonResponse<IEnumerable<GetProductDTO>>();
             var result = await _productService.SearchProducts(name);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -91,9 +91,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetProductsByCategory))]
-        public async Task<ActionResult<Response<IEnumerable<GetProductDTO>>>> GetProductsByCategory(int categoryId)
+        public async Task<ActionResult<CommonResponse<IEnumerable<GetProductDTO>>>> GetProductsByCategory(int categoryId)
         {
-            var response = new Response<IEnumerable<GetProductDTO>>();
+            var response = new CommonResponse<IEnumerable<GetProductDTO>>();
             var result = await _productService.GetProductsByCategory(categoryId);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -109,9 +109,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(FilterByPriceRange))]
-        public async Task<ActionResult<Response<IEnumerable<GetProductDTO>>>> FilterByPriceRange(double from, double to)
+        public async Task<ActionResult<CommonResponse<IEnumerable<GetProductDTO>>>> FilterByPriceRange(double from, double to)
         {
-            var response = new Response<IEnumerable<GetProductDTO>>();
+            var response = new CommonResponse<IEnumerable<GetProductDTO>>();
             var result = await _productService.FilterByPriceRange(from, to);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -127,9 +127,9 @@ namespace E_Commerce.Controllers
 
         [HttpDelete]
         [Route(nameof(DeleteProduct))]
-        public async Task<ActionResult<Response<string>>> DeleteProduct(int id)
+        public async Task<ActionResult<CommonResponse<string>>> DeleteProduct(int id)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _productService.DeleteProduct(id);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -146,9 +146,9 @@ namespace E_Commerce.Controllers
 
         [HttpPatch]
         [Route(nameof(UpdateProduct))]
-        public async Task<ActionResult<Response<GetProductDTO>>> UpdateProduct(UpdateProductDTO product)
+        public async Task<ActionResult<CommonResponse<GetProductDTO>>> UpdateProduct(UpdateProductDTO product)
         {
-            var response = new Response<GetProductDTO>();
+            var response = new CommonResponse<GetProductDTO>();
             var result = await _productService.UpdateProduct(product);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {

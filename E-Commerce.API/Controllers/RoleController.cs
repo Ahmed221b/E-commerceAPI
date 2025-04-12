@@ -19,9 +19,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(AddRole))]
-        public async Task<ActionResult<Response<GetRoleDTO>>> AddRole(string roleName)
+        public async Task<ActionResult<CommonResponse<GetRoleDTO>>> AddRole(string roleName)
         {
-            var response = new Response<GetRoleDTO>();
+            var response = new CommonResponse<GetRoleDTO>();
             var result = await _roleService.AddRole(roleName);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -38,9 +38,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetAllRoles))]
-        public async Task<ActionResult<Response<IEnumerable<GetRoleDTO>>>> GetAllRoles()
+        public async Task<ActionResult<CommonResponse<IEnumerable<GetRoleDTO>>>> GetAllRoles()
         {
-            var response = new Response<IEnumerable<GetRoleDTO>>();
+            var response = new CommonResponse<IEnumerable<GetRoleDTO>>();
             var result = await _roleService.GetAllRoles();
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -56,9 +56,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetRoleByName))]
-        public async Task<ActionResult<Response<GetRoleDTO>>> GetRoleByName(string roleName)
+        public async Task<ActionResult<CommonResponse<GetRoleDTO>>> GetRoleByName(string roleName)
         {
-            var response = new Response<GetRoleDTO>();
+            var response = new CommonResponse<GetRoleDTO>();
             var result = await _roleService.GetRoleByName(roleName);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -74,9 +74,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetRoleById))]
-        public async Task<ActionResult<Response<GetRoleDTO>>> GetRoleById(string id)
+        public async Task<ActionResult<CommonResponse<GetRoleDTO>>> GetRoleById(string id)
         {
-            var response = new Response<GetRoleDTO>();
+            var response = new CommonResponse<GetRoleDTO>();
             var result = await _roleService.GetRoleById(id);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -92,9 +92,9 @@ namespace E_Commerce.Controllers
 
         [HttpDelete]
         [Route(nameof(DeleteRole))]
-        public async Task<ActionResult<Response<string>>> DeleteRole(string roleName)
+        public async Task<ActionResult<CommonResponse<string>>> DeleteRole(string roleName)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _roleService.DeleteRole(roleName);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -110,9 +110,9 @@ namespace E_Commerce.Controllers
 
         [HttpPut]
         [Route(nameof(UpdateRole))]
-        public async Task<ActionResult<Response<GetRoleDTO>>> UpdateRole(string oldRoleName,string newRoleName)
+        public async Task<ActionResult<CommonResponse<GetRoleDTO>>> UpdateRole(string oldRoleName,string newRoleName)
         {
-            var response = new Response<GetRoleDTO>();
+            var response = new CommonResponse<GetRoleDTO>();
             var result = await _roleService.UpdateRole(oldRoleName,newRoleName);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -128,9 +128,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(AssignUserToRole))]
-        public async Task<ActionResult<Response<string>>> AssignUserToRole(UserRoleDTO addUserToRoleDTO)
+        public async Task<ActionResult<CommonResponse<string>>> AssignUserToRole(UserRoleDTO addUserToRoleDTO)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _roleService.AssignUserToRole(addUserToRoleDTO);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -146,9 +146,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(RemoveUserFromRole))]
-        public async Task<ActionResult<Response<string>>> RemoveUserFromRole(UserRoleDTO addUserToRoleDTO)
+        public async Task<ActionResult<CommonResponse<string>>> RemoveUserFromRole(UserRoleDTO addUserToRoleDTO)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _roleService.RemoveUserFromRole(addUserToRoleDTO);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {

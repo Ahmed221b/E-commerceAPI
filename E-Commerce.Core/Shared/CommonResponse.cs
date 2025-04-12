@@ -11,7 +11,7 @@ namespace E_Commerce.Core.Shared
     /// A generic class to return a structured response from endpoints
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Response<T> 
+    public class CommonResponse<T> 
     {
         public List<Error> Errors { get; set; } = new List<Error>();
         public bool IsSuccess => !Errors.Any();

@@ -21,9 +21,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(AddCategory))]
-        public async Task<ActionResult<Response<GetCategoryDTO>>> AddCategory(AddCategoryDTO dto)
+        public async Task<ActionResult<CommonResponse<GetCategoryDTO>>> AddCategory(AddCategoryDTO dto)
         {
-            var response = new Response<GetCategoryDTO>();
+            var response = new CommonResponse<GetCategoryDTO>();
 
             var result = await _categoryService.AddCategory(dto);
             if (result.StatusCode == (int)HttpStatusCode.OK)
@@ -41,9 +41,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetCategories))]
-        public async Task<ActionResult<Response<IEnumerable<GetCategoryListDTO>>>> GetCategories()
+        public async Task<ActionResult<CommonResponse<IEnumerable<GetCategoryListDTO>>>> GetCategories()
         {
-            var response = new Response<IEnumerable<GetCategoryListDTO>>();
+            var response = new CommonResponse<IEnumerable<GetCategoryListDTO>>();
             var result = await _categoryService.GetCategories();
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -60,9 +60,9 @@ namespace E_Commerce.Controllers
 
         [HttpGet]
         [Route(nameof(GetCategory))]
-        public async Task<ActionResult<Response<GetCategoryDTO>>> GetCategory(int id)
+        public async Task<ActionResult<CommonResponse<GetCategoryDTO>>> GetCategory(int id)
         {
-            var response = new Response<GetCategoryDTO>();
+            var response = new CommonResponse<GetCategoryDTO>();
             var result = await _categoryService.GetCategory(id);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -78,9 +78,9 @@ namespace E_Commerce.Controllers
 
         [HttpPut]
         [Route(nameof(UpdateCategory))]
-        public async Task<ActionResult<Response<GetCategoryDTO>>> UpdateCategory(UpdateCategoryDTO dto)
+        public async Task<ActionResult<CommonResponse<GetCategoryDTO>>> UpdateCategory(UpdateCategoryDTO dto)
         {
-            var response = new Response<GetCategoryDTO>();
+            var response = new CommonResponse<GetCategoryDTO>();
             var result = await _categoryService.UpdateCategory(dto);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -97,9 +97,9 @@ namespace E_Commerce.Controllers
         
         [HttpDelete]
         [Route(nameof(DeleteCategory))]
-        public async Task<ActionResult<Response<string>>> DeleteCategory(int id)
+        public async Task<ActionResult<CommonResponse<string>>> DeleteCategory(int id)
         {
-            var response = new Response<string>();
+            var response = new CommonResponse<string>();
             var result = await _categoryService.DeleteCategory(id);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -115,9 +115,9 @@ namespace E_Commerce.Controllers
 
         [HttpPost]
         [Route(nameof(SearchCategories))]
-        public async Task<ActionResult<Response<IEnumerable<GetCategoryListDTO>>>> SearchCategories(string name)
+        public async Task<ActionResult<CommonResponse<IEnumerable<GetCategoryListDTO>>>> SearchCategories(string name)
         {
-            var response = new Response<IEnumerable<GetCategoryListDTO>>();
+            var response = new CommonResponse<IEnumerable<GetCategoryListDTO>>();
             var result = await _categoryService.SearchCategories(name);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {

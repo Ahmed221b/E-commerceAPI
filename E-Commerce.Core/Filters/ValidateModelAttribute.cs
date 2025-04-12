@@ -10,7 +10,7 @@ namespace API.Filters
         {
             if (!context.ModelState.IsValid)
             {
-                var response = new Response<object>
+                var response = new CommonResponse<object>
                 {
                     Errors = context.ModelState
                         .Where(x => x.Value.Errors.Any())

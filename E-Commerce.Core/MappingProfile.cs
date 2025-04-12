@@ -7,8 +7,10 @@ using AutoMapper;
 using E_Commerce.Core.DTO.Cart;
 using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.DTO.Color;
+using E_Commerce.Core.DTO.Order;
 using E_Commerce.Core.DTO.Product;
 using E_Commerce.Core.DTO.Role;
+using E_Commerce.Core.DTO.Wishlist;
 using E_Commerce.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -59,6 +61,33 @@ namespace E_Commerce.Core
                 .ForMember(dest => dest.CartId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.CartItems, opt => opt.MapFrom(src => src.CartItems))
                 .ReverseMap();
+
+            CreateMap<Order, GetOrderDTO>()
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(src => src.OrderDate))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPrice))
+                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderProducts.Select(op => new OrderItemDTO
+                {
+                    Id = op.OrderId,
+                    ProductName = op.Product.Name,
+                    Price = op.Price,
+                    Quantity = op.Quantity
+                }).ToList())).ReverseMap();
+
+            CreateMap<Wishlist,GetWishlistDTO>()
+                .ForMember(dest => dest.WishlistId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.WishlistItems, opt => opt.MapFrom(src => src.WishlistItems.Select(wi => new WishlistItemDTO
+                {
+                    ProductId = wi.ProductId,
+                    ProductName = wi.Product.Name,
+                    ProductImageBase64 = Convert.ToBase64String(wi.Product.Image),
+                    ProductPrice = wi.Product.Price
+
+                }).ToList()))
+                .ReverseMap();
+
+
         }
     }
     

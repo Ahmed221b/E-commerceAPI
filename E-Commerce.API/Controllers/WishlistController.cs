@@ -1,9 +1,8 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using E_Commerce.Core.DTO.Cart;
+using E_Commerce.Core.DTO.Wishlist;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,13 +11,12 @@ namespace E_Commerce.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class CartController : ControllerBase
+    public class WishlistController : ControllerBase
     {
-        private readonly ICartService _cartService;
-
-        public CartController(ICartService cartService)
+        private readonly IWishlistService _wishlistService;
+        public WishlistController(IWishlistService wishlistService)
         {
-            _cartService = cartService;
+            _wishlistService = wishlistService;
         }
 
         private string GetUserId()
@@ -28,22 +26,37 @@ namespace E_Commerce.Controllers
             ?? throw new UnauthorizedAccessException("User ID not found in token");
         }
 
-
-
-
         [HttpPost("items")]
-        public async Task<ActionResult<CommonResponse<CartItemsDTO>>> AddToCart([FromBody] int productId)
+        public async Task<ActionResult<CommonResponse<GetWishlistDTO>>> AddToWishList([FromBody] int productId)
         {
-            var response = new CommonResponse<CartItemsDTO>();
-            var userId = GetUserId(); // Get user ID from token
-            var result = await _cartService.AddItemToCart(new AddToCartDTO { ProductId = productId, UserId = userId });
-
+            var userId = GetUserId();
+            var response = new CommonResponse<GetWishlistDTO>();
+            var result = await _wishlistService.AddToWishlist(productId, userId);
             if (result.StatusCode == StatusCodes.Status200OK)
             {
                 response.Data = result.Data;
                 return Ok(response);
             }
+            response.Errors.Add(new Error
+            {
+                Code = result.StatusCode,
+                Message = result.Message
+            });
+            return StatusCode(result.StatusCode, response);
 
+        }
+
+        [HttpDelete("items/{productId}")]
+        public async Task<ActionResult<CommonResponse<GetWishlistDTO>>> RemoveFromWishlist(int productId)
+        {
+            var userId = GetUserId();
+            var response = new CommonResponse<GetWishlistDTO>();
+            var result = await _wishlistService.RemoveFromWishlist(productId, userId);
+            if (result.StatusCode == StatusCodes.Status200OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
             response.Errors.Add(new Error
             {
                 Code = result.StatusCode,
@@ -53,11 +66,11 @@ namespace E_Commerce.Controllers
         }
 
         [HttpGet("items")]
-        public async Task<ActionResult<CommonResponse<CartItemsDTO>>> GetCartItems()
+        public async Task<ActionResult<CommonResponse<GetWishlistDTO>>> GetWishlist()
         {
-            var response = new CommonResponse<CartItemsDTO>();
-            var userId = GetUserId(); // Get user ID from token
-            var result = await _cartService.GetCartItems(userId);
+            var userId = GetUserId();
+            var response = new CommonResponse<GetWishlistDTO>();
+            var result = await _wishlistService.GetWishlist(userId);
             if (result.StatusCode == StatusCodes.Status200OK)
             {
                 response.Data = result.Data;
@@ -70,51 +83,12 @@ namespace E_Commerce.Controllers
             });
             return StatusCode(result.StatusCode, response);
         }
-
-        [HttpDelete("items/{productId}")]
-        public async Task<ActionResult<CommonResponse<CartItemsDTO>>> RemoveItemFromCart(int productId)
-        {
-            var response = new CommonResponse<CartItemsDTO>();
-            var userId = GetUserId(); // Get user ID from token
-            var result = await _cartService.RemoveItemFromCart(userId, productId);
-            if (result.StatusCode == StatusCodes.Status200OK)
-            {
-                response.Data = result.Data;
-                return Ok(response);
-            }
-            response.Errors.Add(new Error
-            {
-                Code = result.StatusCode,
-                Message = result.Message
-            });
-            return StatusCode(result.StatusCode, response);
-        }
-
-        [HttpPatch("items/{productId}")]
-        public async Task<ActionResult<CommonResponse<CartItemsDTO>>> UpdateItemQuantity(UpdateQuantity updateQuantityDTO)
-        {
-            var response = new CommonResponse<CartItemsDTO>();
-            var userId = GetUserId(); // Get user ID from token
-            var result = await _cartService.UpdateItemQuantity(userId, updateQuantityDTO.ProductId, updateQuantityDTO.Quantity);
-            if (result.StatusCode == StatusCodes.Status200OK)
-            {
-                response.Data = result.Data;
-                return Ok(response);
-            }
-            response.Errors.Add(new Error
-            {
-                Code = result.StatusCode,
-                Message = result.Message
-            });
-            return StatusCode(result.StatusCode, response);
-        }
-
         [HttpDelete("items")]
-        public async Task<ActionResult<CommonResponse<bool>>> ClearCart()
+        public async Task<ActionResult<CommonResponse<bool>>> ClearWishlist()
         {
+            var userId = GetUserId();
             var response = new CommonResponse<bool>();
-            var userId = GetUserId(); // Get user ID from token
-            var result = await _cartService.ClearCart(userId);
+            var result = await _wishlistService.ClearWishlist(userId);
             if (result.StatusCode == StatusCodes.Status200OK)
             {
                 response.Data = result.Data;
