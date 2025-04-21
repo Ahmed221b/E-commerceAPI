@@ -1,147 +1,73 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
 using E_Commerce.Core.Configuration;
 using E_Commerce.Core.DTO.Payment;
 using E_Commerce.Core.Interfaces.Services;
-using E_Commerce.Core.Models;
 using E_Commerce.Core.Shared;
 using E_Commerce.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Stripe;
 
 namespace E_Commerce.Core.Services
 {
-    internal class StripePaymentService : IPaymentService
+    public class StripePaymentService : IPaymentService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private StripeSettings _stripeSettings;
+        private readonly StripeSettings _stripeSettings;
         private readonly UserManager<ApplicationUser> _userManager;
-        public StripePaymentService(IUnitOfWork unitOfWork, IOptions<StripeSettings> options, UserManager<ApplicationUser> userManager)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public StripePaymentService(IOptions<StripeSettings> options, IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
-            _unitOfWork = unitOfWork;
             _stripeSettings = options.Value;
+            Stripe.StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
-        public async Task<ServiceResult<PaymentResult>> ProcessPaymentAsync(PaymentRequest paymentRequest)
+        public async Task<ServiceResult<PaymentResponse>> ProcessPaymentAsync(PaymentRequest paymentRequset)
         {
             try
             {
-                var newPayment = await _unitOfWork.PaymentRepository.AddAsync(
-                    new Payment
-                    {
-                        Amount = paymentRequest.Amount,
-                        Currency = paymentRequest.Currency,
-                        CustomerId = paymentRequest.CustomerId,
-                        CustomerEmail = paymentRequest.CustomerEmail,
-                        CreatedAt = DateTime.UtcNow,
-                        PaymentStatus = Constants.PaymentStatus.Pending.ToString(),
 
+                var user = await _userManager.FindByIdAsync(paymentRequset.CustomerId);
+                if (user == null)
+                {
+                    return new ServiceResult<PaymentResponse>("User not found", (int)HttpStatusCode.NotFound);
+                }
+                var cart = await _unitOfWork.CartRepository.GetCartByUserIdAsync(paymentRequset.CustomerId);
+                if (!cart.CartItems.Any())
+                {
+                    return new ServiceResult<PaymentResponse>("No items in the cart", (int)HttpStatusCode.BadRequest);
+                }
+                var paymentIntentOptions = new PaymentIntentCreateOptions
+                {
+                    Amount = (long)cart.TotalPrice*100,
+                    Currency = paymentRequset.Currency,
+                    ReceiptEmail = paymentRequset.CustomerEmail,
+                    Metadata = new Dictionary<string, string>
+                    {
+                        { "customerId", paymentRequset.CustomerId },
+                        { "orderContext", "Temporary placeholder, replace on webhook" }
                     }
-                );
+                };
+
                 var paymentIntentService = new PaymentIntentService();
-                var paymentMethodService = new PaymentMethodService();
-                var stripeCustomerID = await GetStripeCustomerId(paymentRequest.CustomerId); // Get or create Stripe Customer ID
-                // Attach the payment method token to the customer (if applicable)
-                var paymentMethod = await paymentMethodService.AttachAsync(
-                    paymentRequest.PaymentToken,  // The payment token received from frontend (e.g., "tok_1...")
-                    new PaymentMethodAttachOptions
-                    {
-                        Customer = stripeCustomerID // Pass the customer ID if you have one
-                    }
-                );
-                var paymentIntent = await paymentIntentService.CreateAsync(new PaymentIntentCreateOptions
-                {
-                    Amount = (long)(paymentRequest.Amount * 100), // Convert to cents
-                    Currency = paymentRequest.Currency.ToLower(),
-                    PaymentMethod = paymentMethod.Id,  // Use the PaymentMethod ID here
-                    Confirm = true,
-                    Description = $"Payment for {paymentRequest.CustomerEmail}"
-                });
+                var paymentIntent = await paymentIntentService.CreateAsync(paymentIntentOptions);
 
-
-                if (paymentIntent.Status == "succeeded")
+                var response = new PaymentResponse
                 {
-                    newPayment.IsSuccess = true;
-                    newPayment.PaymentStatus = Constants.PaymentStatus.Completed.ToString();
-                    newPayment.PaymentIntentId = paymentIntent.Id;
-                    return new ServiceResult<PaymentResult>(new PaymentResult
-                    {
-                        IsSuccess = true,
-                        PaymentStatus = Constants.PaymentStatus.Completed.ToString(),
-                        PaymentRecordId = newPayment.Id,
-                        Message = "Payment succeeded",
-                        PaymentIntentId = paymentIntent.Id,
-                    });
-                    //Save order to the database
-                }
-                else
-                {
-                    newPayment.IsSuccess = false;
-                    newPayment.PaymentStatus = Constants.PaymentStatus.Failed.ToString();
-                    newPayment.FailureReason = paymentIntent.Status;
-                    newPayment.PaymentIntentId = paymentIntent.Id;
-                    return new ServiceResult<PaymentResult>(new PaymentResult
-                    {
-                        IsSuccess = false,
-                        PaymentStatus = Constants.PaymentStatus.Failed.ToString(),
-                        Message = paymentIntent.Status,
-                        PaymentIntentId = paymentIntent.Id,
-                    });
-                }
-
+                    PaymentIntentId = paymentIntent.Id,
+                    ClientSecret = paymentIntent.ClientSecret,
+                    PaymentStatus = paymentIntent.Status
+                };
+                return new ServiceResult<PaymentResponse>(response);
             }
             catch (Exception ex)
             {
-                return new ServiceResult<PaymentResult>(new PaymentResult
-                {
-                    IsSuccess = false,
-                    PaymentStatus = Constants.PaymentStatus.Failed.ToString(),
-                    Message = "Payment failed: " + ex.Message,
-
-                });
-
-            }
-            finally
-            {
-                await _unitOfWork.Complete();
+                return new ServiceResult<PaymentResponse>("Error processing payment: " + ex.Message,(int)HttpStatusCode.InternalServerError);
             }
         }
 
 
-        private async Task<string> GetStripeCustomerId(string customerId)
-        {
-            var user = await _userManager.FindByIdAsync(customerId) as E_Commerce.Models.Customer; // Fetch user by their ID
-
-            if (string.IsNullOrEmpty(user.StripeCustomerId))
-            {
-                // User doesn't have a Stripe Customer ID, create one
-                var customerService = new CustomerService();
-                var customer = await customerService.CreateAsync(new CustomerCreateOptions
-                {
-                    Email = user.Email,  // Use the customer's email or other details
-                    Name = user.UserName     // You can add more details if needed
-                });
-
-                // Save the Stripe Customer ID to the user's record
-                user.StripeCustomerId = customer.Id;
-                try
-                {
-                    await _userManager.UpdateAsync(user);
-
-                }
-                catch (Exception ex)
-                {
-
-                }
-                
-                return user.StripeCustomerId;
-            }
-            else
-            {
-                return user.StripeCustomerId;
-            }
-
-        }
+      
     }
 }

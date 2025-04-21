@@ -18,6 +18,7 @@ namespace E_Commerce.Core
         IPaymentRepository PaymentRepository { get; }
         IOrderRepository OrderRepository { get; }
         IWishlistRepository WishlistRepository { get; }
+        IReviewRepository ReviewRepository { get; }
         Task<int> Complete();
     }
 }

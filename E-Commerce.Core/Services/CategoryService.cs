@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http.Results;
-using System.Xml.Linq;
-using AutoMapper;
-using E_Commerce.Core.Custom_Exceptions;
+﻿using AutoMapper;
 using E_Commerce.Core.DTO.Category;
-using E_Commerce.Core.Interfaces.Repositories;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
 using E_Commerce.Models;

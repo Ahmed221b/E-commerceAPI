@@ -61,6 +61,13 @@ namespace E_Commerce.EF
         {
             get => _wishlistRepository == null ? _wishlistRepository = new WishlistRepository(_context) : _wishlistRepository;
         }
+        
+        private IReviewRepository _reviewRepository;
+        public IReviewRepository ReviewRepository
+        {
+            get => _reviewRepository == null ? _reviewRepository = new ReviewRepository(_context) : _reviewRepository;
+        }
+
         public async Task<int> Complete()
         {
             return await _context.SaveChangesAsync();

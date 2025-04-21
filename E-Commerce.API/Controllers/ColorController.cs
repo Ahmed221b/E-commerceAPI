@@ -1,9 +1,7 @@
 ﻿using System.Net;
-using E_Commerce.Core.Custom_Exceptions;
 using E_Commerce.Core.DTO.Color;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce.Controllers
