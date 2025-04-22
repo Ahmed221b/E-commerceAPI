@@ -7,6 +7,7 @@ using AutoMapper;
 using E_Commerce.Core.DTO.Cart;
 using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.DTO.Color;
+using E_Commerce.Core.DTO.CustomerReviews;
 using E_Commerce.Core.DTO.Order;
 using E_Commerce.Core.DTO.Product;
 using E_Commerce.Core.DTO.Role;
@@ -34,6 +35,7 @@ namespace E_Commerce.Core
             CreateMap<Product, GetProductDTO>()
                 .ForMember(dest => dest.ImageBase64, opt => opt.MapFrom(src => Convert.ToBase64String(src.Image))) // Convert byte array to Base64 string
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.Name))
+                .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.CustomerReviews.Select(cr => new GetReviewDTO { CustomerId = cr.CustomerId,ProductId = cr.ProductId,ReviewText = cr.ReviewText,Rate = cr.Rate}).ToList()))
                 .ForMember(dest => dest.Colors, opt => opt.MapFrom(src => src.ProductColors
                     .Where(pc => pc.Color != null)
                     .Select(pc => pc.Color.Name)
@@ -73,7 +75,8 @@ namespace E_Commerce.Core
                     ProductName = op.Product.Name,
                     Price = op.Price,
                     Quantity = op.Quantity
-                }).ToList())).ReverseMap();
+                }).ToList()))
+                .ReverseMap();
 
             CreateMap<Wishlist,GetWishlistDTO>()
                 .ForMember(dest => dest.WishlistId, opt => opt.MapFrom(src => src.Id))
@@ -86,6 +89,14 @@ namespace E_Commerce.Core
 
                 }).ToList()))
                 .ReverseMap();
+
+            CreateMap<CustomerReview, GetReviewDTO>()
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
+                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+                .ForMember(dest => dest.ReviewText, opt => opt.MapFrom(src => src.ReviewText))
+                .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Rate))
+                .ReverseMap();  
+
 
 
         }

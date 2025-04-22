@@ -10,5 +10,6 @@ namespace E_Commerce.Core.Configuration
     {
         public string SecretKey { get; set; }
         public string PublishableKey { get; set; }
+        public string WebhookKey { get; set; }
     }
 }

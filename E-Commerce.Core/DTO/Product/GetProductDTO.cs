@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using E_Commerce.Core.DTO.Color;
+using E_Commerce.Core.DTO.CustomerReviews;
 
 namespace E_Commerce.Core.DTO.Product
 {
@@ -19,6 +20,7 @@ namespace E_Commerce.Core.DTO.Product
         public string ImageBase64 { get; set; }
         public string Category { get; set; }
         public List<string> Colors { get; set; }
+        public List<GetReviewDTO> Reviews { get; set; }
 
 
     }

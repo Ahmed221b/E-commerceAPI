@@ -11,19 +11,19 @@ namespace E_Commerce.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public OrderService(IUnitOfWork unitOfWork,IMapper mapper)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<ServiceResult<GetOrderDTO>> CreateOrderAsync(string CustomerId,int paymentRecordId)
+        public async Task<ServiceResult<GetOrderDTO>> CreateOrderAsync(string CustomerId)
         {
             try
             {
                 var cart = await _unitOfWork.CartRepository.GetCartByUserIdAsync(CustomerId);
-                if (cart == null)
+                if (cart == null || !cart.CartItems.Any())
                 {
-                    return new ServiceResult<GetOrderDTO>("Cart not found", (int)HttpStatusCode.NotFound);
+                    return new ServiceResult<GetOrderDTO>("Cart is Empty!", (int)HttpStatusCode.NotFound);
                 }
                 var newOrder = await _unitOfWork.OrderRepository.AddAsync(
                     new Order
@@ -32,7 +32,6 @@ namespace E_Commerce.Core.Services
                         OrderDate = DateTime.UtcNow,
                         TotalPrice = cart.TotalPrice,
                         CustomerId = CustomerId,
-                        PaymentId = paymentRecordId,
                         OrderProducts = cart.CartItems.Select(cp => new OrderProduct
                         {
                             ProductId = cp.ProductId,
@@ -42,7 +41,7 @@ namespace E_Commerce.Core.Services
 
                     }
                 );
-
+                await HandleStock(newOrder);
                 await _unitOfWork.Complete();
 
                 var result = _mapper.Map<GetOrderDTO>(newOrder);
@@ -52,6 +51,22 @@ namespace E_Commerce.Core.Services
             {
                 return new ServiceResult<GetOrderDTO>("Unexpected error: " + ex.Message, (int)HttpStatusCode.InternalServerError);
             }
+        }
+
+
+        private async Task HandleStock(Order order)
+        {
+
+            foreach (var item in order.OrderProducts)
+            {
+                var product = await _unitOfWork.ProductRepository.GetById(item.ProductId);
+                if (product != null)
+                {
+                    product.Quantity -= item.Quantity;
+                    _unitOfWork.ProductRepository.Update(product);
+                }
+            }
+        
         }
     }
 }

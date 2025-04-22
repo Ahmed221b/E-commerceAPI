@@ -1,10 +1,7 @@
 ﻿using System.Net;
-using E_Commerce.Core.Custom_Exceptions;
 using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
-using E_Commerce.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce.Controllers

@@ -27,7 +27,8 @@ namespace E_Commerce.Data
 
             modelBuilder.Entity<Admin>().ToTable("Admins");
             modelBuilder.Entity<Customer>().ToTable("Customers");
-
+            modelBuilder.Entity<Product>()
+            .ToTable(tb => tb.HasTrigger("trg_UpdateCartOnPriceChange"));
             //One To Many (Customer - Order)
             modelBuilder.Entity<Customer>()
                 .HasMany(p => p.Orders)

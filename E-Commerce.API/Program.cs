@@ -1,13 +1,12 @@
 using System.Text;
+using System.Text.Json;
 using API.Filters;
 using E_Commerce.Core;
 using E_Commerce.Core.Configuration;
-using E_Commerce.Core.Interfaces;
-using E_Commerce.Core.Interfaces.Services;
-using E_Commerce.Core.Services;
+using E_Commerce.Core.Middlewares;
+using E_Commerce.Core.Shared;
 using E_Commerce.Data;
 using E_Commerce.EF;
-using E_Commerce.EF.Repositories;
 using E_Commerce.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -16,10 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using StackExchange.Redis;
 using Stripe;
 
 namespace E_Commerce
@@ -60,14 +57,61 @@ namespace E_Commerce
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
                     ClockSkew = TimeSpan.Zero
                 };
+                o.Events = new JwtBearerEvents
+                {
+                    OnChallenge = async context =>
+                    {
+                        // 1. Terminate the default behavior
+                        context.HandleResponse();
+
+                        // 2. Create your CommonResponse
+                        var response = new CommonResponse<object>
+                        {
+                            Errors = new List<Error>
+                            {
+                                new Error
+                                {
+                                    Code = 401,
+                                    Message = context.AuthenticateFailure?.Message ?? "Unauthorized"
+                                }
+                            }
+                        };
+
+                        // 3. Write the response
+                        context.Response.ContentType = "application/json";
+                        context.Response.StatusCode = 401;
+                        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                    },
+
+                    OnForbidden = async context =>
+                    {
+
+                        var response = new CommonResponse<object>
+                        {
+                            Errors = new List<Error>
+                            {
+                                new Error
+                                {
+                                    Code = 403,
+                                    Message = "Forbidden: Insufficient permissions"
+                                }
+                            }
+                        };
+                        context.Response.ContentType = "application/json";
+                        context.Response.StatusCode = 403;
+                        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+
+                    }
+                };
+
             });
 
-            builder.Services.AddAuthorization(options =>
-            {
-                options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-                    .RequireAuthenticatedUser()
-                    .Build();
-            });
+            //builder.Services.AddAuthorization(options =>
+            //{
+            //    options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+            //        .RequireAuthenticatedUser()
+            //        .Build();
+            //});
 
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -78,9 +122,8 @@ namespace E_Commerce
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
             builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+            StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Value;
 
-
-            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
             builder.Services.AddControllers(options =>
             {
@@ -144,15 +187,12 @@ namespace E_Commerce
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline
-            app.UseRouting();
+            app.UseHttpsRedirection();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI(c =>
+                app.UseSwaggerUI(c =>  
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "E-Commerce API v1");
                     c.OAuthClientId("swagger-ui");
@@ -160,7 +200,11 @@ namespace E_Commerce
                 });
             }
 
-            app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseMiddleware<GlobalExceptionHandlerMiddleware>();  
+
             app.MapControllers();
 
             app.Run();

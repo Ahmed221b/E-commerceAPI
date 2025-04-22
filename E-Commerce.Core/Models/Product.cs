@@ -8,7 +8,7 @@
         public string Description { get; set; }
 
         public double Discount { get; set; }
-        public double Rate { get; set; }
+        public double Rate => CustomerReviews.Average(p => p.Rate);
         public int Quantity { get; set; }
         public byte[] Image { get; set; }
 
