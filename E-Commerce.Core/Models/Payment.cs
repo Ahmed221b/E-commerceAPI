@@ -12,7 +12,7 @@ namespace E_Commerce.Core.Models
     {
         public int Id { get; set; }
         public string PaymentIntentId { get; set; }
-        public int OrderId { get; set; }
+        public int? OrderId { get; set; }
         public string CustomerId { get; set; }
         public string CustomerEmail { get; set; }
         public double Amount { get; set; }

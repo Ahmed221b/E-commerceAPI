@@ -11,11 +11,15 @@ namespace E_Commerce.Controllers
     public class StripeWebhookController : ControllerBase
     {
         private readonly StripeSettings stripeSettings;
-        private readonly ICartService cartService;
-        public StripeWebhookController(IOptions<StripeSettings> options, ICartService cartService)
+        private readonly ICartService _cartService;
+        private readonly IPaymentService _paymentService;
+        private readonly IOrderService _orderService;
+        public StripeWebhookController(IOptions<StripeSettings> options, ICartService cartService, IPaymentService paymentService, IOrderService orderService)
         {
             stripeSettings = options.Value;
-            this.cartService = cartService;
+            _cartService = cartService;
+            _paymentService = paymentService;
+            _orderService = orderService;
         }
 
         [HttpPost("stripe")]
@@ -32,25 +36,28 @@ namespace E_Commerce.Controllers
                     stripeSettings.WebhookKey
                 );
 
+                string customerId = string.Empty;
                 // Handle Stripe event types
                 switch (stripeEvent.Type)
                 {
                     case "payment_intent.succeeded":
                         var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-                        await cartService.ClearCart(paymentIntent.Metadata["customerId"]);
+                        customerId = paymentIntent.Metadata["customerId"];
+                        var result = await _orderService.CreateOrderAsync(customerId);
+                        var newOrder = result.Data;
+                        await _cartService.ClearCart(customerId);
+                        await _paymentService.CreatePaymentRecordAsync(true, customerId, paymentIntent.ReceiptEmail, paymentIntent.Id, paymentIntent.Currency, paymentIntent.Amount,newOrder.OrderId);
+
                         /*TODO
-                         * 1- Create new order to with the suitable status.
-                         * 2- Send a mail to the user with the order confirmation and the invoice.
-                         * 3- Create a success payment record in the payments table in my DB.
-            
+                         * - Send a mail to the user with the order confirmation and the invoice.
                         */
                         break;
 
                     case "payment_intent.payment_failed":
                         var failedPayment = stripeEvent.Data.Object as PaymentIntent;
-                        /*TODO
-                         * 1- Create a faild payment record in the payments table in my DB.
-                         */
+                        customerId = failedPayment.Metadata["customerId"];
+                        await _paymentService.CreatePaymentRecordAsync
+                            (false, customerId,failedPayment.Customer.Email, failedPayment.Id,failedPayment.Currency,failedPayment.Amount,null);
                         break;
 
                     default:

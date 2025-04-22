@@ -75,7 +75,8 @@ namespace E_Commerce.Core
                     ProductName = op.Product.Name,
                     Price = op.Price,
                     Quantity = op.Quantity
-                }).ToList())).ReverseMap();
+                }).ToList()))
+                .ReverseMap();
 
             CreateMap<Wishlist,GetWishlistDTO>()
                 .ForMember(dest => dest.WishlistId, opt => opt.MapFrom(src => src.Id))

@@ -21,7 +21,9 @@ namespace E_Commerce.Core
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IWishlistService, WishlistService>();
             services.AddScoped<IReviewService, ReviewService>();
-            services.AddScoped<IPaymentService, StripePaymentService>();
+            services.AddScoped<IPaymentGatewayService, StripePaymentService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+
 
 
             return services;

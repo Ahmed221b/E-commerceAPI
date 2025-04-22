@@ -3,6 +3,7 @@ using System.Security.Claims;
 using E_Commerce.Core.DTO.Payment;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,11 +11,11 @@ namespace E_Commerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PaymentController : ControllerBase
     {
-        private readonly IPaymentService _paymentService;
-        public PaymentController(IPaymentService paymentService)
+        private readonly IPaymentGatewayService _paymentService;
+        public PaymentController(IPaymentGatewayService paymentService)
         {
             _paymentService = paymentService;
         }

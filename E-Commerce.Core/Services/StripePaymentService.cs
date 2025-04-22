@@ -10,7 +10,7 @@ using Stripe;
 
 namespace E_Commerce.Core.Services
 {
-    public class StripePaymentService : IPaymentService
+    public class StripePaymentService : IPaymentGatewayService
     {
         private readonly StripeSettings _stripeSettings;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -46,7 +46,6 @@ namespace E_Commerce.Core.Services
                     Metadata = new Dictionary<string, string>
                     {
                         { "customerId", paymentRequset.CustomerId },
-                        { "orderContext", "Temporary placeholder, replace on webhook" }
                     }
                 };
 
