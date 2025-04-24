@@ -49,5 +49,3 @@ This is a powerful and secure e-commerce backend built with **.NET 8**, featurin
 - **Stripe API**
 - **SQL Server** (or any supported RDBMS)
 - **Automapper**, **FluentValidation**, etc. (if applicable)
-
- you'd like, I can include a section explaining folder structure, setup instructions, or how to run the app. Just let me know!
