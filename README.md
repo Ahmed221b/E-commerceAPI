@@ -47,5 +47,5 @@ This is a powerful and secure e-commerce backend built with **.NET 8**, featurin
 - **ASP.NET Core Identity**
 - **JWT & Refresh Token Authentication**
 - **Stripe API**
-- **SQL Server** (or any supported RDBMS)
-- **Automapper**, **FluentValidation**, etc. (if applicable)
+- **SQL Server**
+- **Automapper**
