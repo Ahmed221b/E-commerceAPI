@@ -12,10 +12,10 @@ namespace E_Commerce.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class PaymentController : ControllerBase
+    public class PaymentsController : ControllerBase
     {
         private readonly IPaymentGatewayService _paymentService;
-        public PaymentController(IPaymentGatewayService paymentService)
+        public PaymentsController(IPaymentGatewayService paymentService)
         {
             _paymentService = paymentService;
         }
@@ -27,7 +27,7 @@ namespace E_Commerce.Controllers
             ?? throw new UnauthorizedAccessException("User ID not found in token");
         }
 
-        [HttpPost("process-payment")]
+        [HttpPost("checkout")]
         public async Task<ActionResult<CommonResponse<PaymentResponse>>> ProcessPayment(PaymentRequest paymentRequest)
         {
             var response = new CommonResponse<PaymentResponse>();

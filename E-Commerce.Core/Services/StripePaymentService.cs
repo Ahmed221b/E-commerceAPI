@@ -4,6 +4,7 @@ using E_Commerce.Core.DTO.Payment;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
 using E_Commerce.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Stripe;
@@ -62,11 +63,35 @@ namespace E_Commerce.Core.Services
             }
             catch (Exception ex)
             {
-                return new ServiceResult<PaymentResponse>("Error processing payment: " + ex.Message,(int)HttpStatusCode.InternalServerError);
+                return new ServiceResult<PaymentResponse>("Error processing payment: " + ex.Message,StatusCodes.Status500InternalServerError);
             }
         }
 
+        public async Task<ServiceResult<PaymentRefundResponse>> RefundPayment(string paymentIntentId)
+        {
+            try
+            {
+                var refundService = new RefundService();
+                var refundOptions = new RefundCreateOptions
+                {
+                    PaymentIntent = paymentIntentId
+                };
+                var refund = await refundService.CreateAsync(refundOptions);
+                return new ServiceResult<PaymentRefundResponse>(new PaymentRefundResponse
+                {
+                    PaymentIntentId = refund.PaymentIntentId,
+                    RefundStatus = refund.Status
+                });
+            }
+            catch (Exception ex)
+            {
 
-      
+                return new ServiceResult<PaymentRefundResponse>(new PaymentRefundResponse
+                {
+                    PaymentIntentId = paymentIntentId,
+                    RefundStatus = "Payment refund faild: " + ex.Message
+                });
+            }
+        }
     }
 }

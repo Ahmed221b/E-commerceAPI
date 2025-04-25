@@ -13,6 +13,26 @@ namespace E_Commerce.Core.Services
         {
             _unitofwork = unitofwork;
         }
+
+        public async Task<ServiceResult<bool>> ChangePaymentStatus(string paymentIntentId)
+        {
+            try
+            {
+                var payment = await _unitofwork.PaymentRepository.FindSingle(p => p.PaymentIntentId == paymentIntentId);
+                if (payment == null)
+                    return new ServiceResult<bool>("Payment not found", StatusCodes.Status404NotFound);
+                payment.PaymentStatus = PaymentStatus.Refunded.ToString();
+                _unitofwork.PaymentRepository.Update(payment);
+                await _unitofwork.Complete();
+                return new ServiceResult<bool>(true);
+            }
+
+            catch (Exception ex)
+            {
+                return new ServiceResult<bool>("Unexpected Error while changing payment status: " + ex, StatusCodes.Status500InternalServerError);
+            }
+        }
+
         public async Task<ServiceResult<bool>> CreatePaymentRecordAsync(bool IsSucceeded, string customerId, string customerEmail, string paymentIntentId, string currency, double amount,int? orderId)
         {
             try
@@ -39,7 +59,7 @@ namespace E_Commerce.Core.Services
             }
             catch (Exception ex)
             {
-                return new ServiceResult<bool>("Unexpected Error while creating payment record: " + ex, (int)StatusCodes.Status500InternalServerError);
+                return new ServiceResult<bool>("Unexpected Error while creating payment record: " + ex, StatusCodes.Status500InternalServerError);
             }
         }
     }

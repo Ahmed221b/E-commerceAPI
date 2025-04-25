@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using E_Commerce.Core.Models;
 using E_Commerce.Core.Shared;
 
 namespace E_Commerce.Core.Interfaces.Services
@@ -12,5 +13,6 @@ namespace E_Commerce.Core.Interfaces.Services
         Task<ServiceResult<bool>> CreatePaymentRecordAsync
             (bool IsSucceeded, string customerId, string customerEmail, string paymentIntentId, string currency, double amount,int? orderId);
 
+        Task<ServiceResult<bool>> ChangePaymentStatus(string paymentIntentId);
     }
 }

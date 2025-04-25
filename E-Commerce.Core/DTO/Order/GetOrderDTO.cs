@@ -9,7 +9,7 @@ namespace E_Commerce.Core.DTO.Order
     public class GetOrderDTO
     {
         public int OrderId { get; set; }
-        public String Status { get; set; }
+        public string Status { get; set; }
         public DateTime OrderDate { get; set; }
         public double TotalPrice { get; set; }
         public List<OrderItemDTO> OrderItems { get; set; } = new List<OrderItemDTO>();

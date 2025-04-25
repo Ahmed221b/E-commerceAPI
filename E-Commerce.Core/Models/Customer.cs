@@ -8,8 +8,6 @@ namespace E_Commerce.Models
         public DateOnly DataOfBirth { get; set; }
         public int WishlidtId { get; set; }
         public int CartId { get; set; }
-        public string StripeCustomerId { get; set; }
-
         public virtual Cart Cart { get; set; }
         public virtual Wishlist Wishlist { get; set; }
         public virtual ICollection<CustomerReview> CustomerReviews { get; set; } = new List<CustomerReview>();

@@ -9,7 +9,12 @@ namespace E_Commerce.Core.Interfaces.Services
     {
 
         Task<ServiceResult<GetOrderDTO>> CreateOrderAsync(string CustomerId);
-        
+        Task<ServiceResult<GetOrderDTO>> GetOrderByIdAsync(int orderId);
+        Task<ServiceResult<List<GetOrderDTO>>> GetOrdersByCustomerIdAsync(string customerId);
+        Task<ServiceResult<List<GetOrderDTO>>> GetAllOrdersAsync();
+        Task<ServiceResult<GetOrderDTO>> CancelOrder(int orderId);
+        Task<ServiceResult<List<GetOrderDTO>>> GetOrdersByStatusAsync(string status);
+        Task<ServiceResult<GetOrderDTO>> UpdateOrderStatusAsync(int orderId, string status);
 
 
 

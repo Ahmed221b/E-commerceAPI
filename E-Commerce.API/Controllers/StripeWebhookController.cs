@@ -1,5 +1,6 @@
 ﻿using E_Commerce.Core.Configuration;
 using E_Commerce.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
@@ -14,15 +15,18 @@ namespace E_Commerce.Controllers
         private readonly ICartService _cartService;
         private readonly IPaymentService _paymentService;
         private readonly IOrderService _orderService;
-        public StripeWebhookController(IOptions<StripeSettings> options, ICartService cartService, IPaymentService paymentService, IOrderService orderService)
+        private readonly IMailService _mailService;
+        public StripeWebhookController(IOptions<StripeSettings> options, ICartService cartService, IPaymentService paymentService, IOrderService orderService, IMailService mailService)
         {
             stripeSettings = options.Value;
             _cartService = cartService;
             _paymentService = paymentService;
             _orderService = orderService;
+            _mailService = mailService;
         }
 
-        [HttpPost("stripe")]
+        [HttpPost]
+
         public async Task<IActionResult> StripeWebhook()
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
@@ -47,10 +51,8 @@ namespace E_Commerce.Controllers
                         var newOrder = result.Data;
                         await _cartService.ClearCart(customerId);
                         await _paymentService.CreatePaymentRecordAsync(true, customerId, paymentIntent.ReceiptEmail, paymentIntent.Id, paymentIntent.Currency, paymentIntent.Amount,newOrder.OrderId);
-
-                        /*TODO
-                         * - Send a mail to the user with the order confirmation and the invoice.
-                        */
+                        var invoiceBody = InvoiceGenerator.CreateInvoiceMessageBody(newOrder);
+                        var emailResult = await _mailService.SendEmailAsync(new List<string> { paymentIntent.ReceiptEmail }, "Order Invoice", invoiceBody, true);
                         break;
 
                     case "payment_intent.payment_failed":

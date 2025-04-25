@@ -9,6 +9,7 @@ namespace E_Commerce.Core.Interfaces
 {
     public interface IBaseRepository<T> where T : class
     {
+        Task<T> FindSingle(Expression<Func<T, bool>> predicate);
         Task<T> GetById(int id);
         Task<IEnumerable<T>> GetAll();
         Task<T> AddAsync(T entity);

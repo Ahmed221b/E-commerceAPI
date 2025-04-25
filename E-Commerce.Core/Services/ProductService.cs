@@ -104,7 +104,7 @@ namespace E_Commerce.Core.Services
             try
             {
                 var product = await _unitOfWork.ProductRepository.GetById(id);
-                if (product == null)
+                 if (product == null)
                     return new ServiceResult<GetProductDTO>($"No product with id {id} was found", (int)HttpStatusCode.NotFound);
 
                 var data = _mapper.Map<GetProductDTO>(product);

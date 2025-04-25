@@ -3,6 +3,7 @@ using System.Security.Claims;
 using E_Commerce.Core.DTO.Wishlist;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +11,7 @@ namespace E_Commerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Constants.Customer}")]
     public class WishlistController : ControllerBase
     {
         private readonly IWishlistService _wishlistService;

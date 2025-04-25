@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using E_Commerce.Core.Interfaces;
 using E_Commerce.Data;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace E_Commerce.EF.Repositories
 {
@@ -51,6 +45,9 @@ namespace E_Commerce.EF.Repositories
 
             return await query.ToListAsync();
         }
+
+        public async Task<T> FindSingle(Expression<Func<T, bool>> predicate)
+            => await _context.Set<T>().FirstOrDefaultAsync(predicate);
 
         public async Task<IEnumerable<T>> GetAll()
             => await _context.Set<T>().ToListAsync();

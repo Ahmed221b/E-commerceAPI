@@ -6,5 +6,6 @@ namespace E_Commerce.Core.Interfaces.Services
     public interface IPaymentGatewayService
     {
         Task<ServiceResult<PaymentResponse>> ProcessPaymentAsync(PaymentRequest paymentRequset);
+        Task<ServiceResult<PaymentRefundResponse>> RefundPayment(string paymentIntentId);
     }
 }
