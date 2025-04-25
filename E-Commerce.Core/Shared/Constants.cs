@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace E_Commerce.Core.Shared
+﻿namespace E_Commerce.Core.Shared
 {
     public static class Constants
     {
-        public enum Roles 
-        { 
-            Supervisor = 1,
-            Admin = 2,
-            Customer = 3,
-        }
+        public const string Admin = "Admin";
+        public const string Customer = "Customer";
+        public const string Supervisor = "Supervisor";
 
 
         public enum PaymentStatus
@@ -26,11 +17,11 @@ namespace E_Commerce.Core.Shared
 
         public enum OrderStatus
         {
-            Pending = 1,
-            Processing = 2,
-            Shipped = 3,
-            Delivered = 4,
-            Cancelled = 5
+            Processing = 1,
+            Shipped = 2,
+            Delivered = 3,
+            Cancelled = 4,
+            Rejected = 5
         }
 
 

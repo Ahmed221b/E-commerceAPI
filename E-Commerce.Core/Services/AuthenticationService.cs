@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using E_Commerce.Core.Configuration;
 using E_Commerce.Core.DTO.Authentication;
 using E_Commerce.Core.Interfaces.Services;
@@ -14,7 +10,6 @@ using E_Commerce.Core.Shared;
 using E_Commerce.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -373,7 +368,6 @@ namespace E_Commerce.Core.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id), 
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-        
                 // .NET specific claims
                 new Claim(ClaimTypes.NameIdentifier, user.Id), 
                 new Claim("username", user.UserName)

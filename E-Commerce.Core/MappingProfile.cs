@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using E_Commerce.Core.DTO.Cart;
 using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.DTO.Color;
@@ -36,6 +31,7 @@ namespace E_Commerce.Core
                 .ForMember(dest => dest.ImageBase64, opt => opt.MapFrom(src => Convert.ToBase64String(src.Image))) // Convert byte array to Base64 string
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.Name))
                 .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.CustomerReviews.Select(cr => new GetReviewDTO { CustomerId = cr.CustomerId,ProductId = cr.ProductId,ReviewText = cr.ReviewText,Rate = cr.Rate}).ToList()))
+                .ForMember(dest => dest.Rate,opt => opt.MapFrom(src => src.Rate))
                 .ForMember(dest => dest.Colors, opt => opt.MapFrom(src => src.ProductColors
                     .Where(pc => pc.Color != null)
                     .Select(pc => pc.Color.Name)
@@ -71,7 +67,7 @@ namespace E_Commerce.Core
                 .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPrice))
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderProducts.Select(op => new OrderItemDTO
                 {
-                    Id = op.OrderId,
+                    Id = op.Product.Id,
                     ProductName = op.Product.Name,
                     Price = op.Price,
                     Quantity = op.Quantity

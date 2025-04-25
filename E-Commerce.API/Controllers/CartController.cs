@@ -11,7 +11,7 @@ namespace E_Commerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles =$"{Constants.Customer}")]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;

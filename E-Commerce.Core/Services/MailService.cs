@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using E_Commerce.Core.Configuration;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace E_Commerce.Core.Services
@@ -54,7 +50,7 @@ namespace E_Commerce.Core.Services
             }
             catch (Exception ex)
             {
-                return new ServiceResult<bool>("Unexpected error occured: " + ex.Message, (int)HttpStatusCode.InternalServerError);
+                return new ServiceResult<bool>("Unexpected error occured: " + ex.Message, StatusCodes.Status500InternalServerError);
             }
         }
     }

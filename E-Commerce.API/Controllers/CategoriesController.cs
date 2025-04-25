@@ -2,31 +2,36 @@
 using E_Commerce.Core.DTO.Category;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/categories")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
-        public CategoryController(ICategoryService categoryService)
+
+        public CategoriesController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
         }
 
+        // POST: api/categories
         [HttpPost]
-        [Route(nameof(AddCategory))]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Constants.Admin},{Constants.Supervisor}")]
         public async Task<ActionResult<CommonResponse<GetCategoryDTO>>> AddCategory(AddCategoryDTO dto)
         {
             var response = new CommonResponse<GetCategoryDTO>();
 
             var result = await _categoryService.AddCategory(dto);
-            if (result.StatusCode == (int)HttpStatusCode.OK)
+            if (result.StatusCode == (int)HttpStatusCode.Created)
             {
                 response.Data = result.Data;
-                return Ok(response);
+                return StatusCode(StatusCodes.Status201Created, response);
             }
             else
             {
@@ -35,13 +40,13 @@ namespace E_Commerce.Controllers
             }
         }
 
-
+        // GET: api/categories
         [HttpGet]
-        [Route(nameof(GetCategories))]
         public async Task<ActionResult<CommonResponse<IEnumerable<GetCategoryListDTO>>>> GetCategories()
         {
             var response = new CommonResponse<IEnumerable<GetCategoryListDTO>>();
             var result = await _categoryService.GetCategories();
+
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
                 response.Data = result.Data;
@@ -52,15 +57,15 @@ namespace E_Commerce.Controllers
                 response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
                 return StatusCode(result.StatusCode, response);
             }
-
         }
 
-        [HttpGet]
-        [Route(nameof(GetCategory))]
+        // GET: api/categories/{id}
+        [HttpGet("{id}")]
         public async Task<ActionResult<CommonResponse<GetCategoryDTO>>> GetCategory(int id)
         {
             var response = new CommonResponse<GetCategoryDTO>();
             var result = await _categoryService.GetCategory(id);
+
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
                 response.Data = result.Data;
@@ -73,11 +78,14 @@ namespace E_Commerce.Controllers
             }
         }
 
-        [HttpPut]
-        [Route(nameof(UpdateCategory))]
-        public async Task<ActionResult<CommonResponse<GetCategoryDTO>>> UpdateCategory(UpdateCategoryDTO dto)
+        // PUT: api/categories/{id}
+        [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Constants.Admin},{Constants.Supervisor}")]
+        public async Task<ActionResult<CommonResponse<GetCategoryDTO>>> UpdateCategory(int id, UpdateCategoryDTO dto)
         {
             var response = new CommonResponse<GetCategoryDTO>();
+            dto.Id = id; // Ensure the ID from the route is used in the update DTO
+
             var result = await _categoryService.UpdateCategory(dto);
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
@@ -90,14 +98,15 @@ namespace E_Commerce.Controllers
                 return StatusCode(result.StatusCode, response);
             }
         }
-        
-        
-        [HttpDelete]
-        [Route(nameof(DeleteCategory))]
+
+        // DELETE: api/categories/{id}
+        [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Constants.Admin},{Constants.Supervisor}")]
         public async Task<ActionResult<CommonResponse<string>>> DeleteCategory(int id)
         {
             var response = new CommonResponse<string>();
             var result = await _categoryService.DeleteCategory(id);
+
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
                 response.Data = "Category Deleted Successfully";
@@ -110,12 +119,13 @@ namespace E_Commerce.Controllers
             }
         }
 
-        [HttpPost]
-        [Route(nameof(SearchCategories))]
-        public async Task<ActionResult<CommonResponse<IEnumerable<GetCategoryListDTO>>>> SearchCategories(string name)
+        // GET: api/categories/search
+        [HttpGet("search")]
+        public async Task<ActionResult<CommonResponse<IEnumerable<GetCategoryListDTO>>>> SearchCategories([FromQuery] string name)
         {
             var response = new CommonResponse<IEnumerable<GetCategoryListDTO>>();
             var result = await _categoryService.SearchCategories(name);
+
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
                 response.Data = result.Data;
