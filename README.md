@@ -2,7 +2,7 @@
 
 This is a powerful and secure e-commerce backend built with **.NET 8**, featuring modern design patterns, robust authentication, and seamless integration with external services.
 
-## 🚀 Features
+## Features
 
 ### ✅ Authentication & Authorization
 - Implemented using **ASP.NET Identity**, **JWT Access Tokens**, and **Refresh Tokens**
