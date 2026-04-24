@@ -129,6 +129,17 @@ namespace E_Commerce
             {
                 options.Filters.Add<ValidateModelAttribute>();
             });
+            // 1. Define the CORS Policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AngularPolicy", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200") 
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials();
+                });
+            });
 
             // Configure Swagger
             builder.Services.AddEndpointsApiExplorer();
@@ -201,6 +212,7 @@ namespace E_Commerce
             }
 
             app.UseRouting();
+            app.UseCors("AngularPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMiddleware<GlobalExceptionHandlerMiddleware>();  
