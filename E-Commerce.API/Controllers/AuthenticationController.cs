@@ -62,7 +62,7 @@ namespace E_Commerce.Controllers
         }
 
         // GET: api/auth/users/{email}/confirm
-        [HttpGet("users/{email}/confirm")]
+        [HttpGet("users/{email}/confirm", Name = "ConfirmEmail")]
         [AllowAnonymous]
         public async Task<ActionResult<CommonResponse<string>>> ConfirmEmail(string email)
         {

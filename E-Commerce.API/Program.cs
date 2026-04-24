@@ -123,6 +123,8 @@ namespace E_Commerce
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
             builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
             StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Value;
+            builder.Configuration.AddUserSecrets<Program>();
+
 
 
             builder.Services.AddControllers(options =>
@@ -195,6 +197,11 @@ namespace E_Commerce
                 return new UrlHelper(actionContext);
             });
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+            builder.Services.AddControllers()
+                .AddJsonOptions(options => {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                });
 
             var app = builder.Build();
 

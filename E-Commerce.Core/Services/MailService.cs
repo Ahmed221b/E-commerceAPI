@@ -4,6 +4,7 @@ using E_Commerce.Core.Configuration;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace E_Commerce.Core.Services
@@ -11,15 +12,17 @@ namespace E_Commerce.Core.Services
     public class MailService : IMailService
     {
         private readonly MailSettings _mailSettings;
-        public MailService(IOptions<MailSettings> mailSettings)
+        private readonly IConfiguration _configuration;
+        public MailService(IOptions<MailSettings> mailSettings, IConfiguration configuration)
         {
-            _mailSettings = mailSettings.Value;   
+            _mailSettings = mailSettings.Value;
+            _configuration = configuration;
         }
         public async Task<ServiceResult<bool>> SendEmailAsync(List<string> emails, string subject, string message,bool isBodyHtml)
         {
             try
             {
-                var password = Environment.GetEnvironmentVariable("MailServicePassword");
+                var password = _configuration["MailPassword:Password"];
                 // Create the email message
                 var mailMessage = new MailMessage
                 {

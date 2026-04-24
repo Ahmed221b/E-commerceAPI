@@ -5,6 +5,7 @@
     <RootNamespace>E_Commerce.Core</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>b139204f-a4ac-4849-8465-f612e94bd3eb</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
     <PackageReference Include="Stripe.net" Version="48.0.2" />
     <PackageReference Include="System.Security.Permissions" Version="6.0.0" />
