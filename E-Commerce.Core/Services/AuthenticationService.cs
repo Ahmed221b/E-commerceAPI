@@ -61,11 +61,7 @@ namespace E_Commerce.Core.Services
 
 
                 // Create the confirmation link
-                var confirmationLink = _linkGenerator.GetUriByName(
-                         _httpContextAccessor.HttpContext,
-                         "ConfirmEmail",
-                         new { Email = newUser.Email});
-
+                var confirmationLink = $"http://localhost:4200/confirm-email?email={newUser.Email}";
                 var emailBody = $"Please confirm your account by clicking this link: <a href='{confirmationLink}'>link</a>";
 
                 var serviceResult = await _mailService.SendEmailAsync(new List<string> { newUser.Email }, "Confirm your account", emailBody, true);

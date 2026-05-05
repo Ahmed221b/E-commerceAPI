@@ -20,7 +20,7 @@ namespace E_Commerce.Core.DTO.Authentication
 
         [Compare("Password",ErrorMessage = "Passwords don't match")]
         public string ConfirmPassword { get; set; }
-        public string? Address { get; set; }
+        public string Address { get; set; }
         public DateOnly? DateOfBirth { get; set; }
 
         [EmailAddress]
