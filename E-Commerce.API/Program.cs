@@ -36,7 +36,7 @@ namespace E_Commerce
             });
 
             // Configure JWT Authentication
-            var jwtKey = builder.Configuration["JWT:Key"] ?? Environment.GetEnvironmentVariable("JWT_KEY");
+            var jwtKey = builder.Configuration["Jwt:JWTSecret"];
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -134,11 +134,11 @@ namespace E_Commerce
             // 1. Define the CORS Policy
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AngularPolicy", policy =>
+                options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200") 
-                          .AllowAnyMethod()
+                    policy.WithOrigins("http://localhost:4200")
                           .AllowAnyHeader()
+                          .AllowAnyMethod()
                           .AllowCredentials();
                 });
             });
@@ -219,7 +219,7 @@ namespace E_Commerce
             }
 
             app.UseRouting();
-            app.UseCors("AngularPolicy");
+            app.UseCors("AllowFrontend");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMiddleware<GlobalExceptionHandlerMiddleware>();  

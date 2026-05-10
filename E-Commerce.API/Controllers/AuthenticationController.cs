@@ -106,16 +106,17 @@ namespace E_Commerce.Controllers
         // POST: api/auth/tokens/revoke
         [HttpPost("tokens/revoke")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<CommonResponse<string>>> RevokeToken(RevokeTokenDTO token)
+        public async Task<ActionResult<CommonResponse<string>>> RevokeToken()
         {
             var response = new CommonResponse<string>();
-            var refreshToken = token.RefreshToken ?? Request.Cookies["refreshToken"];
+            var refreshToken = Request.Cookies["refreshToken"];
             var authHeader = Request.Headers["Authorization"].FirstOrDefault();
             var accessToken = authHeader?.Split(" ").Last();
             var result = await _authenticationService.RevokeTokenAsync(refreshToken, accessToken);
 
             if (result.StatusCode == (int)HttpStatusCode.OK)
             {
+                Response.Cookies.Delete("refreshToken");
                 response.Data = result.Data;
                 return Ok(response);
             }
@@ -211,6 +212,13 @@ namespace E_Commerce.Controllers
             };
 
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        }
+
+        [HttpGet("test-auth")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult TestAuth()
+        {
+            return Ok(new { message = "You are authorized! The token is valid." });
         }
     }
 }
