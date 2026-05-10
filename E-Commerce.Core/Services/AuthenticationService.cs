@@ -11,6 +11,7 @@ using E_Commerce.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -23,15 +24,18 @@ namespace E_Commerce.Core.Services
         private readonly LinkGenerator _linkGenerator;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMailService _mailService;
+        private readonly IConfiguration _configuration;
+
 
         public AuthenticationService(UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, LinkGenerator linkGenerator,
-        IHttpContextAccessor httpContextAccessor,IMailService mailService)
+        IHttpContextAccessor httpContextAccessor, IMailService mailService, IConfiguration configuration)
         {
             _userManager = userManager;
             _JWT = jwt.Value;
             _linkGenerator = linkGenerator;
             _httpContextAccessor = httpContextAccessor;
             _mailService = mailService;
+            _configuration = configuration;
         }
 
         public async Task<ServiceResult<string>> RegisterAsync(RegisterDTO registerDTO)
@@ -371,7 +375,7 @@ namespace E_Commerce.Core.Services
             .Union(userClaims)
             .Union(rolesClaims);
 
-            var key = Environment.GetEnvironmentVariable("JWT_KEY");
+            var key = _configuration["JWT:JWTSecret"] ?? throw new InvalidOperationException("JWT Key is not configured.");
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
             

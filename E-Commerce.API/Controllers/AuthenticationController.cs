@@ -27,7 +27,7 @@ namespace E_Commerce.Controllers
         {
             var response = new CommonResponse<string>();
             var result = await _authenticationService.RegisterAsync(registerDTO);
-            if (result.StatusCode == (int)HttpStatusCode.Created)
+            if (result.StatusCode == (int)HttpStatusCode.OK)
             {
                 response.Data = result.Data;
                 return StatusCode(StatusCodes.Status201Created, response);
@@ -82,7 +82,7 @@ namespace E_Commerce.Controllers
 
         // POST: api/auth/tokens/refresh
         [HttpPost("tokens/refresh")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [AllowAnonymous]
         public async Task<ActionResult<CommonResponse<AuthModel>>> GenerateNewTokenByRefreshToken()
         {
             var response = new CommonResponse<AuthModel>();
