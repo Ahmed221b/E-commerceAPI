@@ -128,7 +128,7 @@ namespace E_Commerce.Controllers
         }
 
         // PUT: api/auth/users/password
-        [HttpPut("users/password")]
+        [HttpPut("change-password")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<CommonResponse<string>>> ChangePassword(ChangePasswordDTO changePasswordDTO)
         {

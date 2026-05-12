@@ -243,7 +243,7 @@ namespace E_Commerce.Core.Services
                 var isPasswordValid = await _userManager.CheckPasswordAsync(user, changePasswordDTO.CurrentPassword);
                 if (!isPasswordValid)
                 {
-                    return new ServiceResult<string>("Invalid Old Password", (int)HttpStatusCode.Unauthorized);
+                    return new ServiceResult<string>("Invalid Old Password", (int)HttpStatusCode.BadRequest);
                 }
 
                 var result = await _userManager.ChangePasswordAsync(user, changePasswordDTO.CurrentPassword, changePasswordDTO.NewPassword);
