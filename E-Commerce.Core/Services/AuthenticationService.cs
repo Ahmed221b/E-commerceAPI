@@ -278,13 +278,16 @@ namespace E_Commerce.Core.Services
                     return new ServiceResult<string>("User Not Found", (int)HttpStatusCode.NotFound);
                 }
                 var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var resetLink = _linkGenerator.GetUriByName(
-                         _httpContextAccessor.HttpContext,
-                         "ResetPasswordData",
-                         new { Email = user.Email, Token = resetToken });
-                var emailBody = $"Please reset your password by clicking this link: <a href='{resetLink}'>link</a>";
-                var serviceResult = await _mailService.SendEmailAsync(new List<string> { user.Email },"Reset Password", emailBody, true);
-                if (serviceResult.StatusCode == (int)HttpStatusCode.InternalServerError)
+
+                // 2. ENCODE the token and email so special characters don't break the URL
+                var encodedToken = System.Web.HttpUtility.UrlEncode(resetToken);
+                var encodedEmail = System.Web.HttpUtility.UrlEncode(user.Email);
+
+                // 3. Point the link to the ANGULAR frontend route
+                var resetLink = $"http://localhost:4200/reset-password?email={encodedEmail}&token={encodedToken}";
+
+                var emailBody = $"Please reset your password by clicking this link: <a href='{resetLink}'>Reset Password</a>";
+                var serviceResult = await _mailService.SendEmailAsync(new List<string> { user.Email }, "Reset Password", emailBody, true); if (serviceResult.StatusCode == (int)HttpStatusCode.InternalServerError)
                 {
                     return new ServiceResult<string>(serviceResult.Message, (int)HttpStatusCode.InternalServerError);
                 }

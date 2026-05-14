@@ -148,7 +148,7 @@ namespace E_Commerce.Controllers
         }
 
         // POST: api/auth/users/password/forgot
-        [HttpPost("users/password/forgot")]
+        [HttpGet("forgot-password/{email}")]
         [AllowAnonymous]
         public async Task<ActionResult<CommonResponse<string>>> ForgotPassword(string email)
         {
@@ -167,21 +167,8 @@ namespace E_Commerce.Controllers
             }
         }
 
-        // GET: api/auth/users/password/reset-data
-        [HttpGet("users/password/reset-data")]
-        [AllowAnonymous]
-        public IActionResult ResetPasswordData(string email, string token)
-        {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
-            {
-                return BadRequest(new { message = "Invalid reset link" });
-            }
-
-            return Ok(new { email, token });
-        }
-
         // POST: api/auth/users/password/reset
-        [HttpPost("users/password/reset")]
+        [HttpPost("reset-password")]
         [AllowAnonymous]
         public async Task<ActionResult<CommonResponse<string>>> ResetPassword(ResetPasswordDTO resetPasswordDTO)
         {
