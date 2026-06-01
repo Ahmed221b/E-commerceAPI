@@ -51,6 +51,7 @@ namespace E_Commerce.Core.Services
 
                 ApplicationUser newUser = GenerateApplicationUserObject(registerDTO);
                 
+
                 var result = await _userManager.CreateAsync(newUser, registerDTO.Password);
                 if (!result.Succeeded)
                 {
@@ -61,6 +62,16 @@ namespace E_Commerce.Core.Services
                     }
                     model = new AuthModel(resultErrors.ToString());
                     return new ServiceResult<string>(model.Message, (int)HttpStatusCode.InternalServerError);
+                }
+
+                var roleName = registerDTO.IsAdmin ? "Admin" : "Customer";
+
+                var roleResult = await _userManager.AddToRoleAsync(newUser, roleName);
+
+                if (!roleResult.Succeeded)
+                {
+                    var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    return new ServiceResult<string>(errors, (int)HttpStatusCode.InternalServerError);
                 }
 
 
