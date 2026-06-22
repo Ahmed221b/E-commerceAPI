@@ -78,7 +78,7 @@ namespace E_Commerce.Core.Services
             {
                 var colors = await _unitOfWork.ColorRepository.GetAll();
                 if (colors.Count() == 0)
-                    return new ServiceResult<IEnumerable<ColorDTO>>("No colors found", 404);
+                    return new ServiceResult<IEnumerable<ColorDTO>>(new List<ColorDTO>());
                 var data = _mapper.Map<IEnumerable<ColorDTO>>(colors);
                 return new ServiceResult<IEnumerable<ColorDTO>>(data);
             }

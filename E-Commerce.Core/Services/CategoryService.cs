@@ -42,7 +42,11 @@ namespace E_Commerce.Core.Services
             {
                 var categories = await unitOfWork.CategoryRepository.GetAll();
                 if (categories.Count() == 0)
-                    return new ServiceResult<IEnumerable<GetCategoryListDTO>>("No Categories found", 404);
+                {
+                    
+                    return new ServiceResult<IEnumerable<GetCategoryListDTO>>(new List<GetCategoryListDTO>());
+                }
+                    
                 
                 var data = mapper.Map<IEnumerable<GetCategoryListDTO>>(categories);
                 return new ServiceResult<IEnumerable<GetCategoryListDTO>>(data);
