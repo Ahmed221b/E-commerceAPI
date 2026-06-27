@@ -89,7 +89,7 @@ namespace E_Commerce.Core.Services
             {
                 var products = await _unitOfWork.ProductRepository.GetAll();
                 if (products.Count() == 0)
-                    return new ServiceResult<IEnumerable<GetProductDTO>>("No products were found", (int)HttpStatusCode.NotFound);
+                    return new ServiceResult<IEnumerable<GetProductDTO>>(new List<GetProductDTO>());
 
                 var data = _mapper.Map<IEnumerable<GetProductDTO>>(products);
                 return new ServiceResult<IEnumerable<GetProductDTO>>(data);
