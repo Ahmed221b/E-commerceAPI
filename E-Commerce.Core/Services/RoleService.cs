@@ -78,7 +78,7 @@ namespace E_Commerce.Core.Services
                 var result = await _roleManager.Roles.ToListAsync();
                 if (result.Count == 0)
                 {
-                    return new ServiceResult<IEnumerable<GetRoleDTO>>("No roles found", (int)HttpStatusCode.NotFound);
+                    return new ServiceResult<IEnumerable<GetRoleDTO>>(new List<GetRoleDTO>());
                 }
                 var roles = _mapper.Map<IEnumerable<GetRoleDTO>>(result);
                 foreach (var role in roles)
@@ -194,7 +194,6 @@ namespace E_Commerce.Core.Services
                 return new ServiceResult<string>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
             }
         }
-
         public async Task<ServiceResult<string>> RemoveUserFromRole(UserRoleDTO addUserToRoleDTO)
         {
             try
@@ -233,6 +232,30 @@ namespace E_Commerce.Core.Services
             catch (Exception ex)
             {
                 return new ServiceResult<string>("Something Went Wrong " + ex.Message, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+        public async Task<ServiceResult<IEnumerable<UserAutoCompleteDTO>>> SearchUsersToAssign(string query)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(query))
+                    return new ServiceResult<IEnumerable<UserAutoCompleteDTO>>(new List<UserAutoCompleteDTO>());
+
+                var normalizedQuery = query.Trim().ToUpper();
+
+                var users = await _userManager.Users
+                    .Where(u => u.NormalizedUserName.Contains(normalizedQuery) ||
+                                u.NormalizedEmail.Contains(normalizedQuery))
+                    .Take(10)
+                    .ToListAsync();
+
+                var resultDto = _mapper.Map<IEnumerable<UserAutoCompleteDTO>>(users);
+
+                return new ServiceResult<IEnumerable<UserAutoCompleteDTO>>(resultDto);
+            }
+            catch (Exception e)
+            {
+                return new ServiceResult<IEnumerable<UserAutoCompleteDTO>>(e.Message, (int)HttpStatusCode.InternalServerError);
             }
         }
     }

@@ -20,7 +20,7 @@ namespace E_Commerce.Core
             CreateMap<Category,GetCategoryDTO>().ReverseMap();
             CreateMap<Category,GetCategoryListDTO>().ReverseMap();
             CreateMap<Color, ColorDTO>().ReverseMap();
-
+            CreateMap<ApplicationUser, UserAutoCompleteDTO>().ReverseMap();
 
 
             CreateMap<AddProductDTO, Product>()

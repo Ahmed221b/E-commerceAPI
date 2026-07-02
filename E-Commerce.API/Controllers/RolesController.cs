@@ -156,5 +156,23 @@ namespace E_Commerce.Controllers
                 return StatusCode(result.StatusCode, response);
             }
         }
+        
+        [HttpGet("search-users")]
+        public async Task<ActionResult<CommonResponse<IEnumerable<UserAutoCompleteDTO>>>> SearchUsers([FromQuery] string query)
+        {
+            var response = new CommonResponse<IEnumerable<UserAutoCompleteDTO>>();
+            var result = await _roleService.SearchUsersToAssign(query);
+
+            if (result.StatusCode == (int)HttpStatusCode.OK)
+            {
+                response.Data = result.Data;
+                return Ok(response);
+            }
+            else
+            {
+                response.Errors.Add(new Error { Code = result.StatusCode, Message = result.Message });
+                return StatusCode(result.StatusCode, response);
+            }
+        }
     }
 }
