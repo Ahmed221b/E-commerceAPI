@@ -1,18 +1,19 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
-using E_Commerce.Core.DTO.CustomerReviews;
+﻿using E_Commerce.Core.DTO.CustomerReviews;
 using E_Commerce.Core.Interfaces.Services;
 using E_Commerce.Core.Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
 
 namespace E_Commerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Constants.Customer}")]
     public class ReviewController : ControllerBase
     {
         private readonly IReviewService _reviewService;
@@ -60,7 +61,7 @@ namespace E_Commerce.Controllers
             if (result.StatusCode == 200)
             {
                 response.Data = result.Data;
-                return NoContent();
+                return Ok(response);
             }
             else
             {
@@ -76,7 +77,7 @@ namespace E_Commerce.Controllers
         [HttpGet("{productId}")]
         public async Task<ActionResult<CommonResponse<List<GetReviewDTO>>>> GetProductReviews(int productId)
         {
-            var response = new CommonResponse<List<GetReviewDTO>>();
+                var response = new CommonResponse<List<GetReviewDTO>>();
             var result = await _reviewService.GetProductReviews(productId);
             if (result.StatusCode == 200)
             {

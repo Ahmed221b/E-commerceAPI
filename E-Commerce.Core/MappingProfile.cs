@@ -30,7 +30,7 @@ namespace E_Commerce.Core
             CreateMap<Product, GetProductDTO>()
                 .ForMember(dest => dest.ImageBase64, opt => opt.MapFrom(src => Convert.ToBase64String(src.Image))) // Convert byte array to Base64 string
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.Name))
-                .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.CustomerReviews.Select(cr => new GetReviewDTO { CustomerId = cr.CustomerId,ProductId = cr.ProductId,ReviewText = cr.ReviewText,Rate = cr.Rate}).ToList()))
+                .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.CustomerReviews.Select(cr => new GetReviewDTO { CustomerName = cr.Customer.UserName ,ProductId = cr.ProductId,ReviewText = cr.ReviewText,Rate = cr.Rate}).ToList()))
                 .ForMember(dest => dest.Rate,opt => opt.MapFrom(src => src.Rate))
                 .ForMember(dest => dest.Colors, opt => opt.MapFrom(src => src.ProductColors
                     .Where(pc => pc.Color != null)
@@ -88,7 +88,7 @@ namespace E_Commerce.Core
 
             CreateMap<CustomerReview, GetReviewDTO>()
                 .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
-                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.UserName))
                 .ForMember(dest => dest.ReviewText, opt => opt.MapFrom(src => src.ReviewText))
                 .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Rate))
                 .ReverseMap();  
