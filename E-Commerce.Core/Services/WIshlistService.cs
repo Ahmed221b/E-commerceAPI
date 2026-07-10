@@ -38,7 +38,8 @@ namespace E_Commerce.Core.Services
                         {
                             new WishlistItem
                             {
-                                ProductId = productId
+                                ProductId = productId,
+                                Product = product
                             }
                         }
                     };
@@ -52,12 +53,14 @@ namespace E_Commerce.Core.Services
                     }
                     wishlist.WishlistItems.Add(new WishlistItem
                     {
-                        ProductId = productId
+                        ProductId = productId,
+                        Product = product
+
                     });
                     addedWishlist = _unitOfWork.WishlistRepository.Update(wishlist);
                 }
-                var result = _mapper.Map<GetWishlistDTO>(addedWishlist);
                 await _unitOfWork.Complete();
+                var result = _mapper.Map<GetWishlistDTO>(addedWishlist);
                 return new ServiceResult<GetWishlistDTO>(result);
 
             }

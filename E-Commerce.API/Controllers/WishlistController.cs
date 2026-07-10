@@ -93,7 +93,7 @@ namespace E_Commerce.Controllers
             if (result.StatusCode == StatusCodes.Status200OK)
             {
                 response.Data = result.Data;
-                return NoContent();
+                return Ok(response);
             }
             response.Errors.Add(new Error
             {
