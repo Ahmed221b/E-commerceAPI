@@ -32,11 +32,12 @@ namespace E_Commerce.Controllers
 
 
         [HttpPost("items")]
-        public async Task<ActionResult<CommonResponse<CartItemsDTO>>> AddToCart([FromBody] int productId)
+        public async Task<ActionResult<CommonResponse<CartItemsDTO>>> AddToCart([FromBody] AddToCartDTO addToCartDTO)
         {
             var response = new CommonResponse<CartItemsDTO>();
             var userId = GetUserId(); // Get user ID from token
-            var result = await _cartService.AddItemToCart(new AddToCartDTO { ProductId = productId, UserId = userId });
+            addToCartDTO.UserId = userId;
+            var result = await _cartService.AddItemToCart(addToCartDTO);
 
             if (result.StatusCode == StatusCodes.Status200OK)
             {
@@ -118,7 +119,7 @@ namespace E_Commerce.Controllers
             if (result.StatusCode == StatusCodes.Status200OK)
             {
                 response.Data = result.Data;
-                return NoContent();
+                return Ok(response);
             }
             response.Errors.Add(new Error
             {
